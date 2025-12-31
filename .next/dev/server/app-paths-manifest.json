@@ -1,0 +1,10 @@
+{
+  "/_not-found/page": "app/_not-found/page.js",
+  "/community/page": "app/community/page.js",
+  "/courses/[slug]/lesson/[lessonId]/page": "app/courses/[slug]/lesson/[lessonId]/page.js",
+  "/courses/[slug]/page": "app/courses/[slug]/page.js",
+  "/courses/page": "app/courses/page.js",
+  "/labs/page": "app/labs/page.js",
+  "/news/page": "app/news/page.js",
+  "/profile/page": "app/profile/page.js"
+}

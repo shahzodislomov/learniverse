@@ -1,0 +1,32 @@
+/* TEAM */
+
+Creator: shahzod islomov
+Role: Founder & Lead Developer
+Site: learnhub.dev
+GitHub: github.com/shahzodislomov
+LinkedIn: linkedin.com/in/shahzodislomov
+Telegram: t.me/shawn.isl
+Location: Worldwide
+
+/* THANKS */
+
+Community: Our amazing cybersecurity learning community
+Contributors: Everyone who has contributed to making this platform better
+Open Source: The incredible open source projects that make this possible
+
+/* SITE */
+
+Last update: 2024/12/25
+Language: English
+Doctype: HTML5
+Framework: nextjs
+Styling: Tailwind CSS
+Components: shadcn/ui
+Animation: Framer Motion
+
+/* NOTE */
+
+This platform was built with love for the cybersecurity community.
+Our mission is to make security education accessible to everyone.
+
+Learn. Practice. Secure the future.
