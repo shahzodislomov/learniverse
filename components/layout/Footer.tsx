@@ -35,7 +35,7 @@ const footerLinks = {
 const socialLinks = [
   { href: "https://github.com/shahzodislomov", icon: Github, label: "GitHub" },
   { href: "https://www.linkedin.com/in/shahzodislomov/", icon: Linkedin, label: "LinkedIn" },
-  { href: "https://t.me/shawn.isl", icon: TelegramIcon, label: "Telegram" },
+  { href: "https://t.me/shawn_isl", icon: TelegramIcon, label: "Telegram" },
   { href: "#", icon: Youtube, label: "YouTube" },
 ];
 

@@ -4,7 +4,6 @@ import { MainLayout } from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { CourseCard } from "@/components/course/CourseCard";
-import { LabCard } from "@/components/lab/LabCard";
 import { NewsCard } from "@/components/news/NewsCard";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -46,48 +45,6 @@ const learningTracks = [
   },
 ];
 
-const featuredLabs = [
-  {
-    id: "sql-injection-basics",
-    title: "SQL Injection Basics",
-    description: "Practice exploiting SQL injection vulnerabilities in a controlled environment.",
-    difficulty: "beginner" as const,
-    duration: "30 min",
-    points: 100,
-    category: "Web",
-    status: "not-started" as const,
-  },
-  {
-    id: "buffer-overflow-linux",
-    title: "Linux Buffer Overflow",
-    description: "Exploit a classic buffer overflow vulnerability in a Linux binary.",
-    difficulty: "advanced" as const,
-    duration: "2 hours",
-    points: 500,
-    category: "Binary",
-    status: "in-progress" as const,
-  },
-  {
-    id: "privilege-escalation",
-    title: "Linux Privilege Escalation",
-    description: "Find misconfigurations and escalate privileges on a Linux system.",
-    difficulty: "intermediate" as const,
-    duration: "1 hour",
-    points: 250,
-    category: "System",
-    status: "completed" as const,
-  },
-  {
-    id: "web-cache-poisoning",
-    title: "Web Cache Poisoning",
-    description: "Learn to exploit web cache poisoning vulnerabilities.",
-    difficulty: "advanced" as const,
-    duration: "45 min",
-    points: 400,
-    category: "Web",
-    status: "not-started" as const,
-  },
-];
 
 const stats = [
   { icon: BookOpen, value: "150+", label: "Courses" },
@@ -163,9 +120,9 @@ const Index = () => {
                   <ArrowRight className="h-5 w-5" />
                 </Button>
               </Link>
-              <Link href="/labs">
+              <Link href="/ctf">
                 <Button variant="heroOutline" size="xl">
-                  Try a Lab
+                  Try CTF Challenges
                 </Button>
               </Link>
             </div>
@@ -298,21 +255,21 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Featured Labs */}
+      {/* CTF Challenges */}
       <section className="border-b border-border py-24">
         <div className="container mx-auto max-w-7xl px-4">
           <div className="mb-12 flex items-center justify-between">
             <div>
               <h2 className="mb-2 text-3xl font-bold tracking-tight md:text-4xl">
-                Hands-on Labs
+                CTF Challenges
               </h2>
               <p className="text-muted-foreground">
-                Practice real-world security challenges
+                Test your skills with Capture The Flag challenges
               </p>
             </div>
-            <Link href="/labs">
+            <Link href="/ctf">
               <Button variant="outline">
-                View All Labs
+                View All Challenges
                 <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
@@ -323,13 +280,17 @@ const Index = () => {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
-            className="grid gap-6 md:grid-cols-2 lg:grid-cols-4"
+            className="text-center py-12"
           >
-            {featuredLabs.map((lab) => (
-              <motion.div key={lab.id} variants={itemVariants}>
-                <LabCard {...lab} />
-              </motion.div>
-            ))}
+            <p className="text-lg text-muted-foreground mb-6">
+              Capture the Flag challenges are now available!
+            </p>
+            <Link href="/ctf">
+              <Button variant="hero" size="lg">
+                Start Hacking
+                <ArrowRight className="h-5 w-5" />
+              </Button>
+            </Link>
           </motion.div>
         </div>
       </section>
@@ -376,7 +337,7 @@ const Index = () => {
                     category={news.category}
                     author={news.author}
                     readTime={news.readTime}
-                    date={new Date(news.publishedAt || news.createdAt).toLocaleDateString("en-US", {
+                    date={new Date(news.createdAt).toLocaleDateString("en-US", {
                       month: "short",
                       day: "numeric",
                       year: "numeric",

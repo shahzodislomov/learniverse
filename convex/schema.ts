@@ -87,4 +87,67 @@ export default defineSchema({
   })
     .index("by_visitor", ["visitorId"])
     .index("by_visitor_course", ["visitorId", "courseId"]),
+
+  // CTF Challenges
+  ctfChallenges: defineTable({
+    title: v.string(),
+    description: v.string(),
+    flag: v.string(),
+    flagFormat: v.string(), // e.g., "WEN{...}"
+    difficulty: v.union(v.literal("Easy"), v.literal("Medium"), v.literal("Hard")),
+    points: v.number(),
+    category: v.union(
+      v.literal("Web"),
+      v.literal("Crypto"),
+      v.literal("Forensics"),
+      v.literal("OSINT"),
+      v.literal("Reverse"),
+      v.literal("Misc")
+    ),
+    isActive: v.boolean(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+    createdBy: v.string(), // email of admin who created it
+  })
+    .index("by_active", ["isActive"])
+    .index("by_category", ["category"])
+    .index("by_difficulty", ["difficulty"]),
+
+  // CTF Submissions/Solves
+  ctfSubmissions: defineTable({
+    challengeId: v.id("ctfChallenges"),
+    userEmail: v.string(),
+    isCorrect: v.boolean(),
+    submittedFlag: v.string(),
+    submittedAt: v.number(),
+    pointsEarned: v.number(),
+    isFirstBlood: v.boolean(),
+  })
+    .index("by_challenge", ["challengeId"])
+    .index("by_user", ["userEmail"])
+    .index("by_user_challenge", ["userEmail", "challengeId"])
+    .index("by_correct", ["isCorrect", "submittedAt"]),
+
+  // User profiles and settings
+  userProfiles: defineTable({
+    email: v.string(),
+    name: v.string(),
+    avatar: v.string(), // emoji or url
+    bio: v.optional(v.string()),
+    photoStorageId: v.optional(v.id("_storage")),
+    isAdmin: v.boolean(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_email", ["email"])
+    .index("by_admin", ["isAdmin"]),
+
+  // Site settings (logo, etc.)
+  siteSettings: defineTable({
+    key: v.string(),
+    value: v.string(),
+    storageId: v.optional(v.id("_storage")),
+    updatedAt: v.number(),
+    updatedBy: v.string(),
+  }).index("by_key", ["key"]),
 });

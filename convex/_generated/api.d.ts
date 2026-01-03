@@ -9,10 +9,12 @@
  */
 
 import type * as courses from "../courses.js";
+import type * as ctfChallenges from "../ctfChallenges.js";
 import type * as lessons from "../lessons.js";
 import type * as news from "../news.js";
 import type * as seed from "../seed.js";
 import type * as storage from "../storage.js";
+import type * as userProfiles from "../userProfiles.js";
 
 import type {
   ApiFromModules,
@@ -22,10 +24,12 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   courses: typeof courses;
+  ctfChallenges: typeof ctfChallenges;
   lessons: typeof lessons;
   news: typeof news;
   seed: typeof seed;
   storage: typeof storage;
+  userProfiles: typeof userProfiles;
 }>;
 
 /**

@@ -131,7 +131,7 @@ export default function NewsPage() {
                       {featuredNews.category}
                     </Badge>
                     <p className="mb-2 text-sm text-muted-foreground">
-                      {new Date(featuredNews.publishedAt || featuredNews.createdAt).toLocaleDateString("en-US", {
+                      {new Date(featuredNews.createdAt).toLocaleDateString("en-US", {
                         month: "short",
                         day: "numeric",
                         year: "numeric",
@@ -165,14 +165,14 @@ export default function NewsPage() {
                   {restNews.map((article) => (
                     <motion.div key={article._id} variants={itemVariants}>
                       <NewsCard
-                        slug={article.excerpt ? article.slug : undefined}
+                        slug={article.slug}
                         title={article.title}
                         excerpt={article.excerpt}
                         image={article.image || ""}
                         category={article.category}
                         author={article.author}
                         readTime={article.readTime}
-                        date={new Date(article.publishedAt || article.createdAt).toLocaleDateString("en-US", {
+                        date={new Date(article.createdAt).toLocaleDateString("en-US", {
                           month: "short",
                           day: "numeric",
                           year: "numeric",

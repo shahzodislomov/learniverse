@@ -10,6 +10,8 @@ import { useToast } from "@/hooks/use-toast";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
+import { useQuery, useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
 import {
   User,
   Mail,
@@ -20,7 +22,12 @@ import {
   BookOpen,
   Target,
   LogOut,
+  Trophy,
+  Upload,
+  TrendingUp,
 } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const avatarOptions = [
   { id: "default", emoji: "👤" },
@@ -37,12 +44,6 @@ const avatarOptions = [
   { id: "shield", emoji: "🛡️" },
 ];
 
-const stats = [
-  { icon: BookOpen, label: "Courses Enrolled", value: 5 },
-  { icon: Target, label: "Labs Completed", value: 12 },
-  { icon: Award, label: "Certificates", value: 3 },
-  { icon: Shield, label: "Security Score", value: 850 },
-];
 
 export default function Profile() {
   const { user, logout, isAuthenticated, isLoading } = useAuth();
@@ -54,42 +55,84 @@ export default function Profile() {
     email: "",
     bio: "",
     avatar: "default",
+    photo: "",
   });
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  
+  // Get user profile and CTF stats from Convex
+  const userProfile = useQuery(
+    api.userProfiles.getProfile,
+    user ? { email: user.email } : "skip"
+  );
+  const ctfStats = useQuery(
+    api.ctfChallenges.getUserStats,
+    user ? { userEmail: user.email } : "skip"
+  );
+  const updateProfileMutation = useMutation(api.userProfiles.updateProfile);
+  const createProfileMutation = useMutation(api.userProfiles.getOrCreateProfile);
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
       router.push("/auth/login");
       return;
     }
-    if (user) {
-      const savedProfile = localStorage.getItem(`profile_${user.id}`);
-      if (savedProfile) {
-        setProfile(JSON.parse(savedProfile));
-      } else {
-        setProfile({
-          name: user.name,
-          email: user.email,
-          bio: "",
-          avatar: "default",
-        });
-      }
+    if (user && userProfile) {
+      setProfile({
+        name: userProfile.name,
+        email: userProfile.email,
+        bio: userProfile.bio || "",
+        avatar: userProfile.avatar,
+        photo: "",
+      });
+    } else if (user && userProfile === null) {
+      // Create profile if it doesn't exist
+      createProfileMutation({ email: user.email, name: user.name });
     }
-  }, [user, isAuthenticated, isLoading, router]);
+  }, [user, userProfile, isAuthenticated, isLoading, router, createProfileMutation]);
+
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setUploadingPhoto(true);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfile({ ...profile, photo: reader.result as string });
+        setUploadingPhoto(false);
+        toast({
+          title: "Photo uploaded!",
+          description: "Your profile photo has been updated.",
+        });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleSave = async () => {
+    if (!user) return;
+    
     setIsSaving(true);
-    // Save to localStorage
-    if (user) {
-      localStorage.setItem(`profile_${user.id}`, JSON.stringify(profile));
+    try {
+      await updateProfileMutation({
+        email: user.email,
+        name: profile.name,
+        avatar: profile.avatar,
+        bio: profile.bio,
+      });
+      toast({
+        title: "Profile updated!",
+        description: "Your changes have been saved.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update profile. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
     }
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    setIsSaving(false);
-    toast({
-      title: "Profile updated!",
-      description: "Your changes have been saved.",
-    });
   };
 
   const handleLogout = () => {
@@ -103,7 +146,7 @@ export default function Profile() {
 
   const selectedAvatar = avatarOptions.find((a) => a.id === profile.avatar);
 
-  if (isLoading) {
+  if (isLoading || ctfStats === undefined) {
     return (
       <MainLayout>
         <div className="flex min-h-[60vh] items-center justify-center">
@@ -125,18 +168,42 @@ export default function Profile() {
           >
             {/* Avatar */}
             <div className="relative">
-              <div
-                className="flex h-28 w-28 cursor-pointer items-center justify-center rounded-full bg-primary/10 text-5xl transition-transform hover:scale-105"
-                onClick={() => setShowAvatarPicker(!showAvatarPicker)}
-              >
-                {selectedAvatar?.emoji || "👤"}
+              {profile.photo ? (
+                <Avatar className="h-28 w-28 cursor-pointer border-4 border-primary/20 transition-transform hover:scale-105">
+                  <AvatarImage src={profile.photo} alt={profile.name} />
+                  <AvatarFallback>{selectedAvatar?.emoji || "👤"}</AvatarFallback>
+                </Avatar>
+              ) : (
+                <div
+                  className="flex h-28 w-28 cursor-pointer items-center justify-center rounded-full border-4 border-primary/20 bg-primary/10 text-5xl transition-transform hover:scale-105"
+                  onClick={() => setShowAvatarPicker(!showAvatarPicker)}
+                >
+                  {selectedAvatar?.emoji || "👤"}
+                </div>
+              )}
+              <div className="absolute bottom-0 right-0 flex gap-1">
+                <label
+                  htmlFor="photo-upload"
+                  className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-border bg-card text-muted-foreground shadow-lg hover:text-foreground"
+                >
+                  <Upload className="h-4 w-4" />
+                  <input
+                    id="photo-upload"
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handlePhotoUpload}
+                  />
+                </label>
+                {!profile.photo && (
+                  <button
+                    className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-card text-muted-foreground shadow-lg hover:text-foreground"
+                    onClick={() => setShowAvatarPicker(!showAvatarPicker)}
+                  >
+                    <Camera className="h-4 w-4" />
+                  </button>
+                )}
               </div>
-              <button
-                className="absolute bottom-0 right-0 flex h-10 w-10 items-center justify-center rounded-full border border-border bg-card text-muted-foreground shadow-lg hover:text-foreground"
-                onClick={() => setShowAvatarPicker(!showAvatarPicker)}
-              >
-                <Camera className="h-5 w-5" />
-              </button>
 
               {/* Avatar Picker */}
               {showAvatarPicker && (
@@ -170,15 +237,22 @@ export default function Profile() {
 
             <div className="flex-1 text-center md:text-left">
               <h1 className="mb-2 text-3xl font-bold">{profile.name || "User"}</h1>
-              <p className="mb-4 text-muted-foreground">{profile.email}</p>
-              <div className="flex flex-wrap justify-center gap-2 md:justify-start">
-                <span className="rounded-full bg-primary/10 px-3 py-1 text-sm text-primary">
-                  Pro Member
-                </span>
-                <span className="rounded-full bg-muted px-3 py-1 text-sm text-muted-foreground">
-                  Joined Dec 2024
-                </span>
-              </div>
+              <p className="mb-2 text-muted-foreground">{profile.email}</p>
+              {ctfStats && (
+                <div className="mb-4 flex flex-wrap items-center justify-center gap-2 md:justify-start">
+                  <span className="flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-sm text-primary">
+                    <Trophy className="h-3 w-3" />
+                    Rank #{ctfStats.rank}
+                  </span>
+                  <span className="flex items-center gap-1 rounded-full bg-success/10 px-3 py-1 text-sm text-success">
+                    <TrendingUp className="h-3 w-3" />
+                    Top {ctfStats.percentile}%
+                  </span>
+                  <span className="rounded-full bg-muted px-3 py-1 text-sm text-muted-foreground">
+                    {ctfStats.totalPoints} Points
+                  </span>
+                </div>
+              )}
             </div>
 
             <Button variant="outline" className="gap-2" onClick={handleLogout}>
@@ -190,25 +264,101 @@ export default function Profile() {
       </section>
 
       {/* Stats */}
-      <section className="border-b border-border py-8">
-        <div className="container mx-auto max-w-7xl px-4">
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-            {stats.map((stat, index) => (
+      {ctfStats && (
+        <section className="border-b border-border py-8">
+          <div className="container mx-auto max-w-7xl px-4">
+            <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
               <motion.div
-                key={stat.label}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
                 className="rounded-xl border border-border bg-card p-4 text-center"
               >
-                <stat.icon className="mx-auto mb-2 h-6 w-6 text-primary" />
-                <div className="text-2xl font-bold">{stat.value}</div>
-                <div className="text-sm text-muted-foreground">{stat.label}</div>
+                <BookOpen className="mx-auto mb-2 h-6 w-6 text-primary" />
+                <div className="text-2xl font-bold">0</div>
+                <div className="text-sm text-muted-foreground">Courses Enrolled</div>
               </motion.div>
-            ))}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                className="rounded-xl border border-border bg-card p-4 text-center"
+              >
+                <Target className="mx-auto mb-2 h-6 w-6 text-success" />
+                <div className="text-2xl font-bold">{ctfStats.completedChallenges}</div>
+                <div className="text-sm text-muted-foreground">CTF Solved</div>
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="rounded-xl border border-border bg-card p-4 text-center"
+              >
+                <Award className="mx-auto mb-2 h-6 w-6 text-warning" />
+                <div className="text-2xl font-bold">{ctfStats.firstBloods}</div>
+                <div className="text-sm text-muted-foreground">First Bloods</div>
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="rounded-xl border border-border bg-card p-4 text-center"
+              >
+                <Trophy className="mx-auto mb-2 h-6 w-6 text-secondary" />
+                <div className="text-2xl font-bold">{ctfStats.totalPoints}</div>
+                <div className="text-sm text-muted-foreground">CTF Points</div>
+              </motion.div>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
+
+      {/* CTF Progress */}
+      {ctfStats && (
+        <section className="border-b border-border py-8">
+          <div className="container mx-auto max-w-7xl px-4">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="rounded-xl border border-border bg-card p-6"
+            >
+              <div className="mb-4 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Target className="h-5 w-5 text-primary" />
+                  <h2 className="text-lg font-bold">CTF Challenge Progress</h2>
+                </div>
+                <span className="text-sm font-medium text-muted-foreground">
+                  {ctfStats.completedChallenges} / {ctfStats.totalChallenges} Completed
+                </span>
+              </div>
+              <Progress 
+                value={ctfStats.totalChallenges > 0 ? (ctfStats.completedChallenges / ctfStats.totalChallenges) * 100 : 0} 
+                className="h-3"
+              />
+              <div className="mt-4 grid grid-cols-3 gap-4 text-center">
+                <div>
+                  <div className="text-2xl font-bold text-success">{ctfStats.completedChallenges}</div>
+                  <div className="text-xs text-muted-foreground">Solved</div>
+                </div>
+                <div>
+                  <div className="text-2xl font-bold text-warning">
+                    {ctfStats.totalChallenges - ctfStats.completedChallenges}
+                  </div>
+                  <div className="text-xs text-muted-foreground">Remaining</div>
+                </div>
+                <div>
+                  <div className="text-2xl font-bold text-primary">
+                    {ctfStats.totalChallenges > 0 
+                      ? Math.round((ctfStats.completedChallenges / ctfStats.totalChallenges) * 100)
+                      : 0}%
+                  </div>
+                  <div className="text-xs text-muted-foreground">Complete</div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </section>
+      )}
 
       {/* Profile Form */}
       <section className="py-12">

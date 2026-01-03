@@ -226,3 +226,36 @@ export function useGenerateUploadUrl() {
 export function useSeedData() {
   return useMutation(api.seed.seedData);
 }
+
+// Import useAuth at the top
+import { useAuth } from "@/hooks/useAuth";
+
+// User profiles - commented out until convex regenerates
+// export function useCurrentUser() {
+//   const isConfigured = useIsConvexConfigured();
+//   const { user } = useAuth();
+//   const result = useQuery(
+//     api.users.getProfile,
+//     isConfigured && user ? { email: user.email } : "skip"
+//   );
+//   return result;
+// }
+
+// export function useCreateProfile() {
+//   return useMutation(api.users.createProfile);
+// }
+
+// export function useUpdateProfile() {
+//   return useMutation(api.users.updateProfile);
+// }
+
+// Site settings - commented out until convex regenerates
+// export function useSiteLogo() {
+//   const isConfigured = useIsConvexConfigured();
+//   const result = useQuery(api.siteSettings.getLogo, isConfigured ? {} : "skip");
+//   return result;
+// }
+
+// export function useUpdateLogo() {
+//   return useMutation(api.siteSettings.updateLogo);
+// }

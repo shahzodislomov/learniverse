@@ -15,16 +15,15 @@ export const seedData = mutation({
       slug: "web-application-security",
       title: "Web Application Security Fundamentals",
       description: "Learn to identify and exploit common web vulnerabilities including XSS, CSRF, and SQL injection attacks.",
-      shortDescription: "Master web security fundamentals and OWASP Top 10.",
       image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&h=450&fit=crop",
       level: "beginner",
       duration: "2h 15m",
       category: "Web Security",
-      instructor: "Sarah Chen",
-      instructorTitle: "Senior Security Engineer",
-      rating: 4.8,
-      reviewCount: 1250,
-      studentCount: 12500,
+      instructor: {
+        name: "Sarah Chen",
+        title: "Senior Security Engineer",
+        avatar: "https://i.pravatar.cc/150?u=sarah",
+      },
       whatYouLearn: ["Identify XSS vulnerabilities", "Perform SQL injection", "Bypass authentication", "Test for CSRF"],
       requirements: ["Basic HTML/CSS/JS", "HTTP protocol basics"],
       isPublished: true,
@@ -37,16 +36,15 @@ export const seedData = mutation({
       slug: "advanced-penetration-testing",
       title: "Advanced Penetration Testing",
       description: "Master advanced exploitation techniques and post-exploitation methodologies.",
-      shortDescription: "Advanced pentesting for security professionals.",
       image: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800&h=450&fit=crop",
       level: "advanced",
       duration: "4h 30m",
       category: "Pentesting",
-      instructor: "Marcus Johnson",
-      instructorTitle: "Lead Penetration Tester",
-      rating: 4.9,
-      reviewCount: 820,
-      studentCount: 8200,
+      instructor: {
+        name: "Marcus Johnson",
+        title: "Lead Penetration Tester",
+        avatar: "https://i.pravatar.cc/150?u=marcus",
+      },
       whatYouLearn: ["Network exploitation", "Privilege escalation", "Post-exploitation"],
       requirements: ["Networking knowledge", "Linux experience"],
       isPublished: true,
@@ -59,16 +57,15 @@ export const seedData = mutation({
       slug: "network-security-essentials",
       title: "Network Security Essentials",
       description: "Understand network protocols, firewall configuration, and intrusion detection.",
-      shortDescription: "Build a solid network security foundation.",
       image: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&h=450&fit=crop",
       level: "intermediate",
       duration: "3h 10m",
       category: "Network",
-      instructor: "Dr. Elena Rodriguez",
-      instructorTitle: "Network Security Architect",
-      rating: 4.7,
-      reviewCount: 980,
-      studentCount: 9800,
+      instructor: {
+        name: "Dr. Elena Rodriguez",
+        title: "Network Security Architect",
+        avatar: "https://i.pravatar.cc/150?u=elena",
+      },
       whatYouLearn: ["Firewall configuration", "IDS/IPS setup", "Network analysis"],
       requirements: ["TCP/IP basics"],
       isPublished: true,
@@ -89,9 +86,9 @@ export const seedData = mutation({
     await ctx.db.insert("lessons", { courseId: course3, title: "TCP/IP Deep Dive", description: "Network protocol analysis", videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ", duration: "28", moduleTitle: "Networking Basics", order: 1, isPreview: true, createdAt: now, updatedAt: now });
 
     // Seed news
-    await ctx.db.insert("news", { slug: "new-zero-day-discovered", title: "Critical Zero-Day Vulnerability Discovered", excerpt: "Security researchers uncovered a critical vulnerability affecting millions.", content: "Full article content here...", image: "https://images.unsplash.com/photo-1563986768609-322da13575f3?w=800&h=450&fit=crop", category: "Vulnerability", author: "Sarah Chen", readTime: "5 min read", isPublished: true, isFeatured: true, publishedAt: now, createdAt: now, updatedAt: now });
-    await ctx.db.insert("news", { slug: "ransomware-trends-2024", title: "Ransomware Trends: What to Expect in 2025", excerpt: "Analysis of emerging ransomware tactics.", content: "Full article content here...", image: "https://images.unsplash.com/photo-1504639725590-34d0984388bd?w=800&h=450&fit=crop", category: "Analysis", author: "Marcus Johnson", readTime: "8 min read", isPublished: true, isFeatured: true, publishedAt: now - 86400000 * 2, createdAt: now, updatedAt: now });
-    await ctx.db.insert("news", { slug: "ai-in-cybersecurity", title: "How AI is Transforming Cybersecurity", excerpt: "ML and AI in detecting cyber attacks.", content: "Full article content here...", image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&h=450&fit=crop", category: "Technology", author: "Dr. Elena Rodriguez", readTime: "6 min read", isPublished: true, isFeatured: true, publishedAt: now - 86400000 * 4, createdAt: now, updatedAt: now });
+    await ctx.db.insert("news", { slug: "new-zero-day-discovered", title: "Critical Zero-Day Vulnerability Discovered", excerpt: "Security researchers uncovered a critical vulnerability affecting millions.", content: "Full article content here...", image: "https://images.unsplash.com/photo-1563986768609-322da13575f3?w=800&h=450&fit=crop", category: "Vulnerability", author: "Sarah Chen", readTime: "5 min read", isPublished: true, isFeatured: true, createdAt: now, updatedAt: now });
+    await ctx.db.insert("news", { slug: "ransomware-trends-2024", title: "Ransomware Trends: What to Expect in 2025", excerpt: "Analysis of emerging ransomware tactics.", content: "Full article content here...", image: "https://images.unsplash.com/photo-1504639725590-34d0984388bd?w=800&h=450&fit=crop", category: "Analysis", author: "Marcus Johnson", readTime: "8 min read", isPublished: true, isFeatured: true, createdAt: now - 86400000 * 2, updatedAt: now });
+    await ctx.db.insert("news", { slug: "ai-in-cybersecurity", title: "How AI is Transforming Cybersecurity", excerpt: "ML and AI in detecting cyber attacks.", content: "Full article content here...", image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&h=450&fit=crop", category: "Technology", author: "Dr. Elena Rodriguez", readTime: "6 min read", isPublished: true, isFeatured: true, createdAt: now - 86400000 * 4, updatedAt: now });
 
     return { message: "Sample data seeded successfully!" };
   },

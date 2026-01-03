@@ -13,9 +13,13 @@ import {
   ArrowRight,
   Trophy,
   Flame,
-  Star
+  Star,
+  Loader2,
+  Shield
 } from "lucide-react";
 import Link from "next/link";
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
 
 const communityLinks = [
   {
@@ -52,13 +56,6 @@ const communityLinks = [
   },
 ];
 
-const topContributors = [
-  { name: "Alex Security", points: 12500, rank: 1, avatar: "AS" },
-  { name: "CyberNinja42", points: 11200, rank: 2, avatar: "CN" },
-  { name: "HackMaster", points: 10800, rank: 3, avatar: "HM" },
-  { name: "SecPro", points: 9500, rank: 4, avatar: "SP" },
-  { name: "ByteHunter", points: 8900, rank: 5, avatar: "BH" },
-];
 
 const recentDiscussions = [
   {
@@ -94,6 +91,9 @@ const recentDiscussions = [
 ];
 
 export default function CommunityPage() {
+  const scoreboard = useQuery(api.ctfChallenges.getScoreboard, { limit: 10 });
+  const allUsers = useQuery(api.userProfiles.getAllUsers);
+
   return (
     <MainLayout>
       {/* Header */}
@@ -175,68 +175,99 @@ export default function CommunityPage() {
                 <h2 className="text-xl font-bold">Top Contributors</h2>
                 <Trophy className="h-5 w-5 text-warning" />
               </div>
-              <div className="space-y-4">
-                {topContributors.map((user) => (
-                  <div
-                    key={user.rank}
-                    className="flex items-center gap-4 rounded-lg border border-border bg-accent/50 p-4"
-                  >
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary">
-                      {user.rank}
-                    </div>
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted text-sm font-medium">
-                      {user.avatar}
-                    </div>
-                    <div className="flex-1">
-                      <p className="font-medium">{user.name}</p>
-                    </div>
-                    <div className="flex items-center gap-1 text-sm">
-                      <Flame className="h-4 w-4 text-warning" />
-                      <span className="font-medium">{user.points.toLocaleString()}</span>
-                    </div>
+              {scoreboard === undefined ? (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                </div>
+              ) : scoreboard.length === 0 ? (
+                <div className="text-center py-12">
+                  <p className="text-muted-foreground">No users have solved challenges yet</p>
+                </div>
+              ) : (
+                <>
+                  <div className="space-y-4">
+                    {scoreboard.slice(0, 5).map((user) => (
+                      <div
+                        key={user.rank}
+                        className="flex items-center gap-4 rounded-lg border border-border bg-accent/50 p-4"
+                      >
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-sm font-bold text-primary">
+                          {user.rank}
+                        </div>
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted text-sm font-medium">
+                          {user.email.slice(0, 2).toUpperCase()}
+                        </div>
+                        <div className="flex-1">
+                          <p className="font-medium">{user.email.split('@')[0]}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {user.solvedChallenges} challenges · {user.firstBloods} first bloods
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-1 text-sm">
+                          <Flame className="h-4 w-4 text-warning" />
+                          <span className="font-medium">{user.totalPoints.toLocaleString()}</span>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-              <Button variant="outline" className="mt-6 w-full">
-                View Full Leaderboard
-                <ArrowRight className="h-4 w-4" />
-              </Button>
+                  <Link href="/ctf/scoreboard">
+                    <Button variant="outline" className="mt-6 w-full">
+                      View Full Leaderboard
+                      <ArrowRight className="h-4 w-4" />
+                    </Button>
+                  </Link>
+                </>
+              )}
             </motion.div>
 
-            {/* Recent Discussions */}
+            {/* Active Users */}
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               className="rounded-xl border border-border bg-card p-6"
             >
               <div className="mb-6 flex items-center justify-between">
-                <h2 className="text-xl font-bold">Recent Discussions</h2>
-                <MessageSquare className="h-5 w-5 text-primary" />
+                <h2 className="text-xl font-bold">Active Users</h2>
+                <Users className="h-5 w-5 text-primary" />
               </div>
-              <div className="space-y-4">
-                {recentDiscussions.map((discussion, index) => (
-                  <div
-                    key={index}
-                    className="group cursor-pointer rounded-lg border border-border p-4 transition-all duration-300 hover:border-primary/40"
-                  >
-                    <div className="mb-2 flex items-start justify-between">
-                      <h3 className="font-medium group-hover:text-primary">
-                        {discussion.title}
-                      </h3>
-                      <Badge variant="outline">{discussion.category}</Badge>
-                    </div>
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                      <span>by {discussion.author}</span>
-                      <span>•</span>
-                      <span>{discussion.replies} replies</span>
-                    </div>
+              {allUsers === undefined ? (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                </div>
+              ) : allUsers.length === 0 ? (
+                <div className="text-center py-12">
+                  <p className="text-muted-foreground">No registered users yet</p>
+                </div>
+              ) : (
+                <>
+                  <div className="space-y-3">
+                    {allUsers.slice(0, 8).map((user) => (
+                      <div
+                        key={user.email}
+                        className="flex items-center gap-3 rounded-lg border border-border bg-accent/30 p-3"
+                      >
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted text-sm font-medium">
+                          {user.email.slice(0, 2).toUpperCase()}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <p className="font-medium truncate">{user.name}</p>
+                            {user.isAdmin && (
+                              <Shield className="h-3 w-3 text-primary flex-shrink-0" />
+                            )}
+                          </div>
+                          <p className="text-xs text-muted-foreground truncate">
+                            {user.email}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-              <Button variant="outline" className="mt-6 w-full">
-                View All Discussions
-                <ArrowRight className="h-4 w-4" />
-              </Button>
+                  <p className="mt-6 text-center text-sm text-muted-foreground">
+                    {allUsers.length} registered user{allUsers.length !== 1 ? 's' : ''}
+                  </p>
+                </>
+              )}
             </motion.div>
           </div>
         </div>

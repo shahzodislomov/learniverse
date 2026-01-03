@@ -6,7 +6,7 @@ import { Clock, User } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface NewsCardProps {
-  slug: string;
+  slug?: string;
   title: string;
   excerpt: string;
   image: string;
@@ -26,9 +26,8 @@ export function NewsCard({
   readTime,
   date,
 }: NewsCardProps) {
-  const CardInner = (
+  const CardContent = (
     <>
-    <Link href={`/news/${slug}`} className="group block overflow-hidden rounded-xl border border-border bg-card card-hover">
       <div className="relative aspect-[16/9] overflow-hidden">
         <img
           src={image}
@@ -57,19 +56,18 @@ export function NewsCard({
           </span>
         </div>
       </div>
-    </Link>
     </>
   );
 
   return (
     <motion.div whileHover={{ y: -4 }} transition={{ duration: 0.2 }}>
       {slug ? (
-          <Link href={`/news/${slug}`} className="group block overflow-hidden rounded-xl border border-border bg-card card-hover">
-          {CardInner}
+        <Link href={`/news/${slug}`} className="group block overflow-hidden rounded-xl border border-border bg-card card-hover">
+          {CardContent}
         </Link>
       ) : (
         <div className="group block overflow-hidden rounded-xl border border-border bg-card card-hover">
-          {CardInner}
+          {CardContent}
         </div>
       )}
     </motion.div>

@@ -1,0 +1,79 @@
+'use client'
+
+import { motion } from 'framer-motion'
+import { CheckCircle2, Circle, Lock } from 'lucide-react'
+import type { IChallenge } from '../models/Challenge'
+
+interface ChallengeCardProps {
+  challenge: IChallenge & { isSolved?: boolean }
+  onClick: () => void
+}
+
+const difficultyColors: Record<string, string> = {
+  easy: 'text-green-400',
+  medium: 'text-yellow-400',
+  hard: 'text-red-400',
+  // Backward compatibility
+  Easy: 'text-green-400',
+  Medium: 'text-yellow-400',
+  Hard: 'text-red-400',
+}
+
+const difficultyBorder: Record<string, string> = {
+  easy: 'border-green-400/50 hover:border-green-400',
+  medium: 'border-yellow-400/50 hover:border-yellow-400',
+  hard: 'border-red-400/50 hover:border-red-400',
+  Easy: 'border-green-400/50 hover:border-green-400',
+  Medium: 'border-yellow-400/50 hover:border-yellow-400',
+  Hard: 'border-red-400/50 hover:border-red-400',
+}
+
+export default function ChallengeCard({ challenge, onClick }: ChallengeCardProps) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      whileHover={{ scale: 1.02, y: -5 }}
+      whileTap={{ scale: 0.98 }}
+      onClick={onClick}
+      className={`glass rounded-lg p-6 cursor-pointer border-2 transition-all group ${
+        challenge.isSolved
+          ? 'border-hacker-green/50 bg-hacker-green/5'
+          : difficultyBorder[challenge.difficulty] || difficultyBorder.easy
+      }`}
+    >
+      <div className="flex items-start justify-between mb-4 overflow-hidden">
+        <div className="flex-1">
+          <div className="flex items-center space-x-2 mb-2">
+            <h3 className="text-xl font-bold text-hacker-green group-hover:text-glow-green transition-all">{challenge.title}</h3>
+            {challenge.isSolved && (
+              <CheckCircle2 className="w-5 h-5 text-hacker-green animate-pulse" />
+            )}
+          </div>
+          <p className="text-gray-400 text-sm mb-3 line-clamp-2 ">{challenge.description}</p>
+        </div>
+      </div>
+
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-4">
+          <span
+            className={`px-3 py-1 rounded text-xs font-semibold ${difficultyColors[challenge.difficulty] || difficultyColors.easy
+              }`}
+          >
+            {typeof challenge.difficulty === 'string'
+              ? challenge.difficulty.charAt(0).toUpperCase() + challenge.difficulty.slice(1)
+              : challenge.difficulty}
+          </span>
+          <span className="text-hacker-cyan text-sm font-mono">
+            {challenge.category}
+          </span>
+        </div>
+        <div className="flex items-center space-x-2">
+          <span className="text-hacker-green font-bold text-lg">{challenge.points}</span>
+          <span className="text-gray-500 text-sm">pts</span>
+        </div>
+      </div>
+    </motion.div>
+  )
+}
+

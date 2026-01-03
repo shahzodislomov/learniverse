@@ -1,33 +1,29 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, BookOpen, Newspaper, ArrowLeft } from "lucide-react";
-import { useAuth } from "@/hooks/useAuth";
+import { LayoutDashboard, BookOpen, Newspaper, ArrowLeft, Shield, FileText, Settings } from "lucide-react";
+import { useAdminGuard } from "@/hooks/useAdminGuard";
+import { Loader2 } from "lucide-react";
 
 const adminNavLinks = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/courses", label: "Courses", icon: BookOpen },
   { href: "/admin/news", label: "News", icon: Newspaper },
+  { href: "/admin/resources", label: "Resources", icon: FileText },
+  { href: "/admin/ctf", label: "CTF Challenges", icon: Shield },
+  { href: "/admin/settings", label: "Settings", icon: Settings },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const router = useRouter();
-  const { isAuthenticated, isLoading } = useAuth();
+  const user = useAdminGuard();
 
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      router.replace("/auth/login");
-    }
-  }, [isAuthenticated, isLoading, router]);
-
-  if (isLoading || !isAuthenticated) {
+  if (!user) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <p className="text-sm text-muted-foreground">Checking authentication...</p>
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
