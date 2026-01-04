@@ -37,7 +37,6 @@ export default function RootLayout({
             <TooltipProvider>
               {children}
               <Toaster />
-              {/* <Sonner /> */}
             </TooltipProvider>
           </QueryProvider>
         </ConvexClientProvider>
