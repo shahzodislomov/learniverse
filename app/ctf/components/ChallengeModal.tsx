@@ -16,6 +16,7 @@ interface ChallengeModalProps {
   challenge: any
   isOpen: boolean
   onClose: () => void
+  onSuccess?: () => void
   userEmail?: string
 }
 
@@ -23,6 +24,7 @@ export default function ChallengeModal({
   challenge,
   isOpen,
   onClose,
+  onSuccess,
   userEmail,
 }: ChallengeModalProps) {
   const router = useRouter()
@@ -77,6 +79,10 @@ export default function ChallengeModal({
           toast.success(`🩸 First Blood! You earned ${result.points} points!`)
         } else {
           toast.success(`Correct! You earned ${result.points} points!`)
+        }
+        // Call onSuccess callback if provided
+        if (onSuccess) {
+          onSuccess()
         }
         setTimeout(() => {
           handleClose()

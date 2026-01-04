@@ -87,7 +87,9 @@ export default function CourseDetail() {
                 <div className="flex items-center gap-1 text-sm">
                   <Star className="h-4 w-4 fill-warning text-warning" />
                   <span className="font-medium">{course.rating}</span>
-                  <span className="text-muted-foreground">({course.students})</span>
+                  <span className="text-muted-foreground">
+                    ({"students" in course ? course.students : "studentCount" in course ? course.studentCount : 0})
+                  </span>
                 </div>
               </div>
 
@@ -110,7 +112,7 @@ export default function CourseDetail() {
                 </div>
                 <div className="flex items-center gap-2">
                   <Users className="h-4 w-4 text-muted-foreground" />
-                  <span>{course.students} students</span>
+                  <span>{"students" in course ? course.students : "studentCount" in course ? course.studentCount : 0} students</span>
                 </div>
               </div>
             </motion.div>
@@ -184,9 +186,9 @@ export default function CourseDetail() {
                             className="flex items-center gap-4 p-4 transition-colors hover:bg-muted/50"
                           >
                             <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                              {lesson.completed ? (
+                              {"completed" in lesson && lesson.completed ? (
                                 <CheckCircle2 className="h-5 w-5 text-success" />
-                              ) : lesson.locked ? (
+                              ) : "locked" in lesson && lesson.locked ? (
                                 <Lock className="h-5 w-5 text-muted-foreground" />
                               ) : (
                                 <Play className="h-5 w-5 text-primary" />
@@ -198,7 +200,7 @@ export default function CourseDetail() {
                                 {lesson.duration}
                               </p>
                             </div>
-                            {lesson.locked && (
+                            {"locked" in lesson && lesson.locked && (
                               <Lock className="h-4 w-4 text-muted-foreground" />
                             )}
                           </Link>

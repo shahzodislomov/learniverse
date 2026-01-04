@@ -110,44 +110,46 @@ export default function NewsPage() {
           {featuredNews && (
             <section className="border-b border-border py-12">
               <div className="container mx-auto max-w-7xl px-4">
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="grid gap-8 lg:grid-cols-2"
-                >
-                  <div className="relative aspect-video overflow-hidden rounded-xl">
-                    <img
-                      src={featuredNews.image || ""}
-                      alt={featuredNews.title}
-                      className="h-full w-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
-                    <Badge variant="cyber" className="absolute left-4 top-4">
-                      Featured
-                    </Badge>
-                  </div>
-                  <div className="flex flex-col justify-center">
-                    <Badge variant="outline" className="mb-4 w-fit">
-                      {featuredNews.category}
-                    </Badge>
-                    <p className="mb-2 text-sm text-muted-foreground">
-                      {new Date(featuredNews.createdAt).toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric",
-                      })}
-                    </p>
-                    <h2 className="mb-4 text-3xl font-bold leading-tight">
-                      {featuredNews.title}
-                    </h2>
-                    <p className="mb-6 text-muted-foreground">{featuredNews.excerpt}</p>
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                      <span>By {featuredNews.author}</span>
-                      <span>•</span>
-                      <span>{featuredNews.readTime}</span>
+                <Link href={`/news/${featuredNews.slug}`}>
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="grid gap-8 lg:grid-cols-2 group cursor-pointer"
+                  >
+                    <div className="relative aspect-video overflow-hidden rounded-xl">
+                      <img
+                        src={featuredNews.image || ""}
+                        alt={featuredNews.title}
+                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
+                      <Badge variant="cyber" className="absolute left-4 top-4">
+                        Featured
+                      </Badge>
                     </div>
-                  </div>
-                </motion.div>
+                    <div className="flex flex-col justify-center">
+                      <Badge variant="outline" className="mb-4 w-fit">
+                        {featuredNews.category}
+                      </Badge>
+                      <p className="mb-2 text-sm text-muted-foreground">
+                        {new Date(featuredNews.createdAt).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })}
+                      </p>
+                      <h2 className="mb-4 text-3xl font-bold leading-tight transition-colors group-hover:text-primary">
+                        {featuredNews.title}
+                      </h2>
+                      <p className="mb-6 text-muted-foreground">{featuredNews.excerpt}</p>
+                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                        <span>By {featuredNews.author}</span>
+                        <span>•</span>
+                        <span>{featuredNews.readTime}</span>
+                      </div>
+                    </div>
+                  </motion.div>
+                </Link>
               </div>
             </section>
           )}

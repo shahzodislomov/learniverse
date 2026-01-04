@@ -52,7 +52,6 @@ export default function AdminNews() {
 
   const [formData, setFormData] = useState({
     title: "",
-    slug: "",
     excerpt: "",
     content: "",
     category: "Technology",
@@ -63,7 +62,6 @@ export default function AdminNews() {
   const resetForm = () => {
     setFormData({
       title: "",
-      slug: "",
       excerpt: "",
       content: "",
       category: "Technology",
@@ -73,14 +71,13 @@ export default function AdminNews() {
   };
 
   const handleCreate = async () => {
-    if (!formData.slug || !formData.slug.trim()) {
-      toast.error("Slug is required and must be unique");
+    if (!formData.title || !formData.title.trim()) {
+      toast.error("Title is required");
       return;
     }
 
     try {
       await createNews({
-        slug: formData.slug,
         title: formData.title,
         excerpt: formData.excerpt,
         content: formData.content,
@@ -98,15 +95,10 @@ export default function AdminNews() {
 
   const handleUpdate = async () => {
     if (!editingNews) return;
-    if (!formData.slug || !formData.slug.trim()) {
-      toast.error("Slug is required");
-      return;
-    }
 
     try {
       await updateNews({
         id: editingNews._id as Id<"news">,
-        slug: formData.slug,
         title: formData.title,
         excerpt: formData.excerpt,
         content: formData.content,
@@ -158,7 +150,6 @@ export default function AdminNews() {
   const openEditDialog = (article: any) => {
     setFormData({
       title: article.title,
-      slug: article.slug || "",
       excerpt: article.excerpt,
       content: article.content,
       category: article.category,

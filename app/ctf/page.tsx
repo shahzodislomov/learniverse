@@ -36,7 +36,7 @@ export default function Home() {
               leaderboard.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link href="/challenges">
+              <Link href="/ctf/challenges">
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}

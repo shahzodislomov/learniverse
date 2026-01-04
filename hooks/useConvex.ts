@@ -29,6 +29,8 @@ export function useCourses() {
       ...course,
       shortDescription: course.description.slice(0, 120) + "...",
       studentCount: course.studentsCount,
+      lessons: course.lessonsCount,
+      students: course.studentsCount,
     }));
   }
   

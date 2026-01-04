@@ -2,10 +2,10 @@
 
 import { motion } from 'framer-motion'
 import { CheckCircle2, Circle, Lock } from 'lucide-react'
-import type { IChallenge } from '../models/Challenge'
+import type { IConvexChallenge } from '../models/Challenge'
 
 interface ChallengeCardProps {
-  challenge: IChallenge & { isSolved?: boolean }
+  challenge: IConvexChallenge
   onClick: () => void
 }
 

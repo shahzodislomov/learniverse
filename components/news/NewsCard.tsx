@@ -17,7 +17,7 @@ interface NewsCardProps {
 }
 
 export function NewsCard({
-  slug,
+  slug: propSlug,
   title,
   excerpt,
   image,
@@ -26,6 +26,12 @@ export function NewsCard({
   readTime,
   date,
 }: NewsCardProps) {
+  // Generate slug from title if not provided
+  const slug = propSlug || title
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+
   const CardContent = (
     <>
       <div className="relative aspect-[16/9] overflow-hidden">
