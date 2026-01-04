@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { Shield, Mail, Lock, User, ArrowRight, Check, Loader2 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import { toast } from "sonner";
+import { useToast } from "@/hooks/use-toast";
 
 const benefits = [
   "Access to 150+ courses",
@@ -19,6 +19,7 @@ const benefits = [
 export default function Register() {
   const router = useRouter();
   const { signup, isLoading: authLoading } = useAuth();
+  const { toast } = useToast();
   
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -30,7 +31,10 @@ export default function Register() {
     e.preventDefault();
     
     if (!agreedToTerms) {
-      toast.error("Please agree to the Terms of Service and Privacy Policy");
+      toast({
+        title: "Please agree to the Terms of Service and Privacy Policy",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -39,10 +43,16 @@ export default function Register() {
     const result = await signup(name, email, password);
     
     if (result.success) {
-      toast.success("Account created successfully!");
+      toast({
+        title: "Account created successfully!",
+        variant: "default",
+      });
       router.push("/dashboard");
     } else {
-      toast.error(result.error || "Registration failed");
+      toast({
+        title: result.error || "Registration failed",
+        variant: "destructive",
+      });
     }
     
     setIsSubmitting(false);

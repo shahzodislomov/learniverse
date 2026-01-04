@@ -35,7 +35,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useAllNews, useCreateNews, useUpdateNews, useDeleteNews } from "@/hooks/useConvex";
-import { toast } from "sonner";
+import { useToast } from "@/hooks/use-toast";
 import NewsForm from "./NewsForm";
 import { Id } from "../../../convex/_generated/dataModel";
 
@@ -46,6 +46,7 @@ export default function AdminNews() {
   const createNews = useCreateNews();
   const updateNews = useUpdateNews();
   const deleteNews = useDeleteNews();
+  const { toast } = useToast();
 
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editingNews, setEditingNews] = useState<any>(null);
@@ -72,7 +73,10 @@ export default function AdminNews() {
 
   const handleCreate = async () => {
     if (!formData.title || !formData.title.trim()) {
-      toast.error("Title is required");
+      toast({
+        title: "Title is required",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -85,11 +89,17 @@ export default function AdminNews() {
         author: formData.author,
         image: formData.image || undefined,
       });
-      toast.success("Article created successfully");
+      toast({
+        title: "Article created successfully",
+        variant: "default",
+      });
       setIsCreateOpen(false);
       resetForm();
     } catch (error) {
-      toast.error("Failed to create article");
+      toast({
+        title: "Failed to create article",
+        variant: "destructive",
+      });
     }
   };
 
@@ -106,20 +116,32 @@ export default function AdminNews() {
         author: formData.author,
         image: formData.image || undefined,
       });
-      toast.success("Article updated successfully");
+      toast({
+        title: "Article updated successfully",
+        variant: "default",
+      });
       setEditingNews(null);
       resetForm();
     } catch (error) {
-      toast.error("Failed to update article");
+      toast({
+        title: "Failed to update article",
+        variant: "destructive",
+      });
     }
   };
 
   const handleDelete = async (id: Id<"news">) => {
     try {
       await deleteNews({ id });
-      toast.success("Article deleted successfully");
+      toast({
+        title: "Article deleted successfully",
+        variant: "default",
+      });
     } catch (error) {
-      toast.error("Failed to delete article");
+      toast({
+        title: "Failed to delete article",
+        variant: "destructive",
+      });
     }
   };
 
@@ -129,9 +151,15 @@ export default function AdminNews() {
         id: article._id as Id<"news">,
         isPublished: !article.isPublished,
       });
-      toast.success(article.isPublished ? "Article unpublished" : "Article published");
+      toast({
+        title: article.isPublished ? "Article unpublished" : "Article published",
+        variant: "default",
+      });
     } catch (error) {
-      toast.error("Failed to update article");
+      toast({
+        title: "Failed to update article",
+        variant: "destructive",
+      });
     }
   };
 
@@ -141,9 +169,15 @@ export default function AdminNews() {
         id: article._id as Id<"news">,
         isFeatured: !article.isFeatured,
       });
-      toast.success(article.isFeatured ? "Removed from featured" : "Added to featured");
+      toast({
+        title: article.isFeatured ? "Removed from featured" : "Added to featured",
+        variant: "default",
+      });
     } catch (error) {
-      toast.error("Failed to update article");
+      toast({
+        title: "Failed to update article",
+        variant: "destructive",
+      });
     }
   };
 

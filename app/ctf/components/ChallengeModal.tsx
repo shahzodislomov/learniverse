@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, CheckCircle2, XCircle, Loader2, Users, Droplet } from 'lucide-react'
-import { toast } from "sonner"
+import { useToast } from "../../../hooks/use-toast"
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useMutation, useQuery } from 'convex/react'
@@ -37,6 +37,7 @@ export default function ChallengeModal({
     points: number
     bonusPoints: number
   } | null>(null)
+  const { toast } = useToast()
 
   const submitFlag = useMutation(api.ctfChallenges.submitFlag)
   const solvers = useQuery(
@@ -50,12 +51,18 @@ export default function ChallengeModal({
     e.preventDefault()
 
     if (!flag.trim()) {
-      toast.error('Please enter a flag')
+      toast({
+        title: 'Please enter a flag',
+        variant: 'destructive',
+      })
       return
     }
 
     if (!userEmail) {
-      toast.error('Please log in to submit flags')
+      toast({
+        title: 'Please log in to submit flags',
+        variant: 'destructive',
+      })
       router.push('/auth/login')
       return
     }
@@ -76,9 +83,15 @@ export default function ChallengeModal({
           bonusPoints: result.bonusPoints,
         })
         if (result.firstBlood) {
-          toast.success(`🩸 First Blood! You earned ${result.points} points!`)
+          toast({
+            title: `🩸 First Blood! You earned ${result.points} points!`,
+            variant: 'default',
+          })
         } else {
-          toast.success(`Correct! You earned ${result.points} points!`)
+          toast({
+            title: `Correct! You earned ${result.points} points!`,
+            variant: 'default',
+          })
         }
         // Call onSuccess callback if provided
         if (onSuccess) {
@@ -89,11 +102,17 @@ export default function ChallengeModal({
         }, 2000)
       } else {
         setShake(true)
-        toast.error('Incorrect flag')
+        toast({
+          title: 'Incorrect flag',
+          variant: 'destructive',
+        })
         setTimeout(() => setShake(false), 500)
       }
     } catch (error: any) {
-      toast.error(error.message || 'Failed to submit flag')
+      toast({
+        title: error.message || 'Failed to submit flag',
+        variant: 'destructive',
+      })
       setShake(true)
       setTimeout(() => setShake(false), 500)
     } finally {

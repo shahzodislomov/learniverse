@@ -11,7 +11,7 @@ import { Upload, FileText, Loader2 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { toast } from "sonner";
+import { useToast } from "@/hooks/use-toast";
 
 const ALLOWED_FILE_TYPES = [
   "application/pdf",
@@ -26,6 +26,7 @@ const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
 
 export default function AdminResourcesPage() {
   const { user } = useAuth();
+  const { toast } = useToast();
   const [isUploading, setIsUploading] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [formData, setFormData] = useState({
@@ -42,13 +43,19 @@ export default function AdminResourcesPage() {
 
     // Validate file type
     if (!ALLOWED_FILE_TYPES.includes(file.type)) {
-      toast.error("Invalid file type. Only PDF, ZIP, TXT, DOC, and DOCX files are allowed.");
+      toast({
+        title: "Invalid file type. Only PDF, ZIP, TXT, DOC, and DOCX files are allowed.",
+        variant: "destructive",
+      });
       return;
     }
 
     // Validate file size
     if (file.size > MAX_FILE_SIZE) {
-      toast.error(`File size must be less than ${MAX_FILE_SIZE / (1024 * 1024)}MB`);
+      toast({
+        title: `File size must be less than ${MAX_FILE_SIZE / (1024 * 1024)}MB`,
+        variant: "destructive",
+      });
       return;
     }
 
@@ -59,7 +66,10 @@ export default function AdminResourcesPage() {
     e.preventDefault();
     
     if (!selectedFile || !user) {
-      toast.error("Please select a file and ensure you're logged in");
+      toast({
+        title: "Please select a file and ensure you're logged in",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -89,7 +99,10 @@ export default function AdminResourcesPage() {
       //   fileSize: selectedFile.size,
       // });
 
-      toast.success("Resource uploaded successfully!");
+      toast({
+        title: "Resource uploaded successfully!",
+        variant: "default",
+      });
       
       // Reset form
       setFormData({ title: "", description: "", category: "guides" });
@@ -97,7 +110,10 @@ export default function AdminResourcesPage() {
       
     } catch (error) {
       console.error("Upload error:", error);
-      toast.error("Failed to upload resource");
+      toast({
+        title: "Failed to upload resource",
+        variant: "destructive",
+      });
     } finally {
       setIsUploading(false);
     }

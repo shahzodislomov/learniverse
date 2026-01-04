@@ -35,7 +35,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useAllCourses, useCreateCourse, useUpdateCourse, useDeleteCourse } from "@/hooks/useConvex";
-import { toast } from "sonner";
+import { useToast } from "@/hooks/use-toast";
 import CourseForm from "./CourseForm";
 import Link from "next/link";
 import { Id } from "../../../convex/_generated/dataModel";
@@ -48,6 +48,7 @@ export default function AdminCourses() {
   const createCourse = useCreateCourse();
   const updateCourse = useUpdateCourse();
   const deleteCourse = useDeleteCourse();
+  const { toast } = useToast();
 
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editingCourse, setEditingCourse] = useState<any>(null);
@@ -94,11 +95,17 @@ export default function AdminCourses() {
         whatYouLearn: formData.whatYouLearn.split("\n").filter(Boolean),
         requirements: formData.requirements.split("\n").filter(Boolean),
       });
-      toast.success("Course created successfully");
+      toast({
+        title: "Course created successfully",
+        variant: "default",
+      });
       setIsCreateOpen(false);
       resetForm();
     } catch (error) {
-      toast.error("Failed to create course");
+      toast({
+        title: "Failed to create course",
+        variant: "destructive",
+      });
     }
   };
 
@@ -120,20 +127,32 @@ export default function AdminCourses() {
         whatYouLearn: formData.whatYouLearn.split("\n").filter(Boolean),
         requirements: formData.requirements.split("\n").filter(Boolean),
       });
-      toast.success("Course updated successfully");
+      toast({
+        title: "Course updated successfully",
+        variant: "default",
+      });
       setEditingCourse(null);
       resetForm();
     } catch (error) {
-      toast.error("Failed to update course");
+      toast({
+        title: "Failed to update course",
+        variant: "destructive",
+      });
     }
   };
 
   const handleDelete = async (id: Id<"courses">) => {
     try {
       await deleteCourse({ id });
-      toast.success("Course deleted successfully");
+      toast({
+        title: "Course deleted successfully",
+        variant: "default",
+      });
     } catch (error) {
-      toast.error("Failed to delete course");
+      toast({
+        title: "Failed to delete course",
+        variant: "destructive",
+      });
     }
   };
 
@@ -143,9 +162,15 @@ export default function AdminCourses() {
         id: course._id as Id<"courses">,
         isPublished: !course.isPublished,
       });
-      toast.success(course.isPublished ? "Course unpublished" : "Course published");
+      toast({
+        title: course.isPublished ? "Course unpublished" : "Course published",
+        variant: "default",
+      });
     } catch (error) {
-      toast.error("Failed to update course");
+      toast({
+        title: "Failed to update course",
+        variant: "destructive",
+      });
     }
   };
 
@@ -155,9 +180,15 @@ export default function AdminCourses() {
         id: course._id as Id<"courses">,
         isFeatured: !course.isFeatured,
       });
-      toast.success(course.isFeatured ? "Removed from featured" : "Added to featured");
+      toast({
+        title: course.isFeatured ? "Removed from featured" : "Added to featured",
+        variant: "default",
+      });
     } catch (error) {
-      toast.error("Failed to update course");
+      toast({
+        title: "Failed to update course",
+        variant: "destructive",
+      });
     }
   };
 

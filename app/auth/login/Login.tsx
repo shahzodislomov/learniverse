@@ -7,11 +7,12 @@ import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { Shield, Mail, Lock, ArrowRight, Loader2 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import { toast } from "sonner";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Login() {
   const router = useRouter();
   const { login, isLoading: authLoading } = useAuth();
+  const { toast } = useToast();
   
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -24,10 +25,16 @@ export default function Login() {
     const result = await login(email, password);
     
     if (result.success) {
-      toast.success("Welcome back!");
+      toast({
+        title: "Welcome back!",
+        variant: "default",
+      });
       router.push("/dashboard");
     } else {
-      toast.error(result.error || "Login failed");
+      toast({
+        title: result.error || "Login failed",
+        variant: "destructive",
+      });
     }
     
     setIsSubmitting(false);

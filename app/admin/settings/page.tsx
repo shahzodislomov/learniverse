@@ -9,7 +9,7 @@ import { Upload, Loader2, Image as ImageIcon } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { toast } from "sonner";
+import { useToast } from "@/hooks/use-toast";
 // import { useSiteLogo, useUpdateLogo } from "@/hooks/useConvex"; // Uncomment after convex regenerates
 
 const ALLOWED_LOGO_TYPES = ["image/png", "image/jpeg", "image/jpg", "image/svg+xml"];
@@ -17,6 +17,7 @@ const MAX_LOGO_SIZE = 2 * 1024 * 1024; // 2MB
 
 export default function AdminSettingsPage() {
   const { user } = useAuth();
+  const { toast } = useToast();
   const [isUploading, setIsUploading] = useState(false);
   const [selectedLogo, setSelectedLogo] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>("");
@@ -32,13 +33,19 @@ export default function AdminSettingsPage() {
 
     // Validate file type
     if (!ALLOWED_LOGO_TYPES.includes(file.type)) {
-      toast.error("Invalid file type. Only PNG, JPG, JPEG, and SVG are allowed.");
+      toast({
+        title: "Invalid file type. Only PNG, JPG, JPEG, and SVG are allowed.",
+        variant: "destructive",
+      });
       return;
     }
 
     // Validate file size
     if (file.size > MAX_LOGO_SIZE) {
-      toast.error(`Logo size must be less than ${MAX_LOGO_SIZE / (1024 * 1024)}MB`);
+      toast({
+        title: `Logo size must be less than ${MAX_LOGO_SIZE / (1024 * 1024)}MB`,
+        variant: "destructive",
+      });
       return;
     }
 
@@ -54,7 +61,10 @@ export default function AdminSettingsPage() {
 
   const handleUploadLogo = async () => {
     if (!selectedLogo || !user) {
-      toast.error("Please select a logo and ensure you're logged in");
+      toast({
+        title: "Please select a logo and ensure you're logged in",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -79,13 +89,19 @@ export default function AdminSettingsPage() {
       //   storageId,
       // });
 
-      toast.success("Logo uploaded successfully! (Settings will be enabled after Convex setup)");
+      toast({
+        title: "Logo uploaded successfully! (Settings will be enabled after Convex setup)",
+        variant: "default",
+      });
       setSelectedLogo(null);
       setPreviewUrl("");
       
     } catch (error) {
       console.error("Upload error:", error);
-      toast.error("Failed to upload logo");
+      toast({
+        title: "Failed to upload logo",
+        variant: "destructive",
+      });
     } finally {
       setIsUploading(false);
     }

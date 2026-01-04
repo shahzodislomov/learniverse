@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Plus, Edit, Trash2, Eye, EyeOff, Search, Loader2 } from "lucide-react";
-import { toast } from "sonner";
+import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
 import { useMutation, useQuery } from "convex/react";
@@ -44,6 +44,7 @@ interface ChallengeFormData {
 
 export default function AdminCTFPage() {
   const { user } = useAuth();
+  const { toast } = useToast();
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [showFlags, setShowFlags] = useState(false);
@@ -61,11 +62,14 @@ export default function AdminCTFPage() {
     isActive: true,
   });
 
-  // Check admin access
-  const adminCheck = useQuery(api.userProfiles.checkAdmin, user ? { email: user.email } : "skip");
+  // Check admin access - only proceed if user has valid email
+  const adminCheck = useQuery(
+    api.userProfiles.checkAdmin, 
+    user?.email ? { email: user.email } : "skip"
+  );
   const challenges = useQuery(
     api.ctfChallenges.adminGetAllChallenges,
-    user ? { adminEmail: user.email } : "skip"
+    user?.email ? { adminEmail: user.email } : "skip"
   );
 
   const createChallenge = useMutation(api.ctfChallenges.adminCreateChallenge);
@@ -107,17 +111,26 @@ export default function AdminCTFPage() {
           challengeId: editingId,
           ...formData,
         });
-        toast.success("Challenge updated successfully");
+        toast({
+          title: "Challenge updated successfully",
+          variant: "default",
+        });
       } else {
         await createChallenge({
           adminEmail: user.email,
           ...formData,
         });
-        toast.success("Challenge created successfully");
+        toast({
+          title: "Challenge created successfully",
+          variant: "default",
+        });
       }
       handleCloseModal();
     } catch (error: any) {
-      toast.error(error.message || "Failed to save challenge");
+      toast({
+        title: error.message || "Failed to save challenge",
+        variant: "destructive",
+      });
     }
   };
 
@@ -129,9 +142,15 @@ export default function AdminCTFPage() {
         adminEmail: user.email,
         challengeId: id,
       });
-      toast.success("Challenge deleted successfully");
+      toast({
+        title: "Challenge deleted successfully",
+        variant: "default",
+      });
     } catch (error: any) {
-      toast.error(error.message || "Failed to delete challenge");
+      toast({
+        title: error.message || "Failed to delete challenge",
+        variant: "destructive",
+      });
     }
   };
 
