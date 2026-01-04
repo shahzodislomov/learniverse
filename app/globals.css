@@ -9,6 +9,11 @@
   :root {
     --background: 222 47% 4%;
     --foreground: 210 40% 96%;
+    --card: 222 47% 7%;
+    --border: 217 33% 17%;
+
+    --background: 222 47% 4%;
+    --foreground: 210 40% 96%;
 
     --card: 222 47% 7%;
     --card-foreground: 210 40% 96%;
