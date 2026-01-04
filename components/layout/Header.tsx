@@ -13,6 +13,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useMounted } from "@/hooks/use-mounted";
+
 
 const navLinks = [
   { href: "/courses", label: "Courses" },
@@ -61,6 +63,9 @@ export function Header() {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
+
+  const mounted = useMounted();
+  if (!mounted) return null;
 
   return (
     <>
