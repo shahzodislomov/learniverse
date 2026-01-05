@@ -20,104 +20,6 @@ import { useState } from "react";
 
 const resourceCategories = ["All", "Cheatsheets", "Tools", "Guides", "References"];
 
-const resources = [
-  {
-    title: "SQL Injection Cheatsheet",
-    description: "Comprehensive reference for SQL injection payloads and bypass techniques.",
-    category: "Cheatsheets",
-    icon: Database,
-    downloadUrl: "#",
-    type: "PDF",
-  },
-  {
-    title: "XSS Payload Collection",
-    description: "Curated list of XSS payloads for different contexts and filter bypasses.",
-    category: "Cheatsheets",
-    icon: Code2,
-    downloadUrl: "#",
-    type: "PDF",
-  },
-  {
-    title: "Linux Privilege Escalation Guide",
-    description: "Step-by-step guide for privilege escalation on Linux systems.",
-    category: "Guides",
-    icon: Terminal,
-    downloadUrl: "#",
-    type: "PDF",
-  },
-  {
-    title: "Burp Suite Extensions",
-    description: "Essential Burp Suite extensions for web application testing.",
-    category: "Tools",
-    icon: Shield,
-    externalUrl: "#",
-    type: "Link",
-  },
-  {
-    title: "OWASP Testing Guide",
-    description: "Comprehensive web application security testing methodology.",
-    category: "References",
-    icon: BookOpen,
-    externalUrl: "#",
-    type: "Link",
-  },
-  {
-    title: "Reverse Shell Cheatsheet",
-    description: "Quick reference for reverse shell commands in various languages.",
-    category: "Cheatsheets",
-    icon: Terminal,
-    downloadUrl: "#",
-    type: "PDF",
-  },
-  {
-    title: "Nmap Command Reference",
-    description: "Complete reference for Nmap scanning options and NSE scripts.",
-    category: "Cheatsheets",
-    icon: Terminal,
-    downloadUrl: "#",
-    type: "PDF",
-  },
-  {
-    title: "Metasploit Framework Guide",
-    description: "Getting started with Metasploit for penetration testing.",
-    category: "Guides",
-    icon: Shield,
-    downloadUrl: "#",
-    type: "PDF",
-  },
-  {
-    title: "Web Security Tools Collection",
-    description: "Curated list of essential tools for web security testing.",
-    category: "Tools",
-    icon: Code2,
-    externalUrl: "#",
-    type: "Link",
-  },
-  {
-    title: "CTF Resources & Writeups",
-    description: "Collection of CTF challenges, tools, and writeups for practice.",
-    category: "References",
-    icon: BookOpen,
-    externalUrl: "#",
-    type: "Link",
-  },
-  {
-    title: "Windows Privilege Escalation",
-    description: "Techniques for privilege escalation on Windows systems.",
-    category: "Guides",
-    icon: Terminal,
-    downloadUrl: "#",
-    type: "PDF",
-  },
-  {
-    title: "API Security Testing Guide",
-    description: "Methodology for testing API security vulnerabilities.",
-    category: "Guides",
-    icon: Code2,
-    downloadUrl: "#",
-    type: "PDF",
-  },
-];
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -132,16 +34,57 @@ const itemVariants = {
   visible: { opacity: 1, y: 0 },
 };
 
+import { useQuery, useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { toast } from "sonner";
+import { Id } from "@/convex/_generated/dataModel";
+
+// Category to icon mapping
+const categoryIcons: Record<string, any> = {
+  "Cheatsheets": FileText,
+  "Tools": Code2,
+  "Guides": BookOpen,
+  "References": Database,
+  "default": Shield
+};
+
 export default function ResourcesPage() {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
 
-  const filteredResources = resources.filter((resource) => {
+  // Fetch resources from Convex
+  const allResources = useQuery(api.resources.listPublished) || [];
+  const incrementDownload = useMutation(api.resources.incrementDownload);
+
+  // Get unique categories from resources
+  const categories = ["All", ...Array.from(new Set(allResources.map(r => r.category)))];
+
+  const filteredResources = allResources.filter((resource) => {
     const matchesSearch = resource.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       resource.description.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = selectedCategory === "All" || resource.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
+
+  const handleDownload = async (resourceId: Id<"resources">, fileUrl: string, fileName: string) => {
+    try {
+      // Increment download count
+      await incrementDownload({ resourceId });
+
+      // Download the file
+      const link = document.createElement('a');
+      link.href = fileUrl;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      toast.success("Download started!");
+    } catch (error) {
+      console.error("Download error:", error);
+      toast.error("Failed to download file");
+    }
+  };
 
   return (
     <MainLayout>
@@ -181,7 +124,7 @@ export default function ResourcesPage() {
       <section className="border-b border-border py-6">
         <div className="container mx-auto max-w-7xl px-4">
           <div className="flex flex-wrap items-center justify-center gap-2">
-            {resourceCategories.map((cat) => (
+            {categories.map((cat) => (
               <Button
                 key={cat}
                 variant={selectedCategory === cat ? "default" : "outline"}
@@ -210,37 +153,47 @@ export default function ResourcesPage() {
             animate="visible"
             className="grid gap-6 md:grid-cols-2 lg:grid-cols-3"
           >
-            {filteredResources.map((resource, index) => (
-              <motion.div
-                key={resource.title}
-                variants={itemVariants}
-                className="group rounded-xl border border-border bg-card p-6 transition-all duration-300 hover:border-primary/40 hover:shadow-lg"
-              >
-                <div className="mb-4 flex items-start justify-between">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                    <resource.icon className="h-6 w-6 text-primary" />
+            {filteredResources.map((resource, index) => {
+              const IconComponent = categoryIcons[resource.category] || categoryIcons.default;
+              
+              return (
+                <motion.div
+                  key={resource._id}
+                  variants={itemVariants}
+                  className="group rounded-xl border border-border bg-card p-6 transition-all duration-300 hover:border-primary/40 hover:shadow-lg"
+                >
+                  <div className="mb-4 flex items-start justify-between">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
+                      <IconComponent className="h-6 w-6 text-primary" />
+                    </div>
+                    <Badge variant="outline">{resource.category}</Badge>
                   </div>
-                  <Badge variant="outline">{resource.category}</Badge>
-                </div>
-                <h3 className="mb-2 text-lg font-semibold group-hover:text-primary">
-                  {resource.title}
-                </h3>
-                <p className="mb-4 text-sm text-muted-foreground">
-                  {resource.description}
-                </p>
-                {resource.downloadUrl ? (
-                  <Button variant="outline" size="sm" className="w-full gap-2">
-                    <Download className="h-4 w-4" />
-                    Download {resource.type}
-                  </Button>
-                ) : (
-                  <Button variant="outline" size="sm" className="w-full gap-2">
-                    <ExternalLink className="h-4 w-4" />
-                    View Resource
-                  </Button>
-                )}
-              </motion.div>
-            ))}
+                  <h3 className="mb-2 text-lg font-semibold group-hover:text-primary">
+                    {resource.title}
+                  </h3>
+                  <p className="mb-4 text-sm text-muted-foreground">
+                    {resource.description}
+                  </p>
+                  <div className="flex items-center justify-between gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="flex-1 gap-2"
+                      onClick={() => handleDownload(resource._id, resource.fileUrl!, resource.fileName)}
+                    >
+                      <Download className="h-4 w-4" />
+                      Download PDF
+                    </Button>
+                    <span className="text-xs text-muted-foreground">
+                      {(resource.fileSize / 1024 / 1024).toFixed(1)} MB
+                    </span>
+                  </div>
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    {resource.downloadCount} downloads
+                  </p>
+                </motion.div>
+              );
+            })}
           </motion.div>
 
           {filteredResources.length === 0 && (

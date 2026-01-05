@@ -47,7 +47,7 @@ export default function Register() {
         title: "Account created successfully!",
         variant: "default",
       });
-      router.push("/dashboard");
+      router.push("/profile");
     } else {
       toast({
         title: result.error || "Registration failed",

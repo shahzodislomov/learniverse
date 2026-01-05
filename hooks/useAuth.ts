@@ -1,10 +1,15 @@
 import { useState, useEffect, useCallback } from "react";
+import { useMutation, useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
 
 export interface User {
-  id: string;
+  userId: string;
   email: string;
   name: string;
-  createdAt: string;
+  avatar?: string;
+  bio?: string;
+  photoUrl?: string;
+  isAdmin: boolean;
 }
 
 interface AuthState {
@@ -12,143 +17,126 @@ interface AuthState {
   isLoading: boolean;
 }
 
-const AUTH_STORAGE_KEY = "learnhub_auth";
-const USERS_STORAGE_KEY = "learnhub_users";
+const AUTH_STORAGE_KEY = "learnhub_auth_email";
 
-// Get stored users from localStorage
-function getStoredUsers(): Record<string, { password: string; user: User }> {
+// Get current auth email from localStorage
+function getStoredEmail(): string | null {
   try {
-    const stored = localStorage.getItem(USERS_STORAGE_KEY);
-    return stored ? JSON.parse(stored) : {};
-  } catch {
-    return {};
-  }
-}
-
-// Save users to localStorage
-function saveUsers(users: Record<string, { password: string; user: User }>) {
-  localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(users));
-}
-
-// Get current auth session
-function getStoredAuth(): User | null {
-  try {
-    const stored = localStorage.getItem(AUTH_STORAGE_KEY);
-    return stored ? JSON.parse(stored) : null;
+    return localStorage.getItem(AUTH_STORAGE_KEY);
   } catch {
     return null;
   }
 }
 
-// Save auth session
-function saveAuth(user: User | null) {
-  if (user) {
-    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
+// Save auth email to localStorage
+function saveEmail(email: string | null) {
+  if (email) {
+    localStorage.setItem(AUTH_STORAGE_KEY, email);
   } else {
     localStorage.removeItem(AUTH_STORAGE_KEY);
   }
 }
 
 export function useAuth() {
-  const [state, setState] = useState<AuthState>({
-    user: null,
-    isLoading: true,
-  });
+  const [email, setEmail] = useState<string | null>(null);
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  const registerMutation = useMutation(api.auth.register);
+  const loginMutation = useMutation(api.auth.login);
+  
+  // Get current user from Convex
+  const currentUser = useQuery(
+    api.auth.getCurrentUser,
+    email ? { email } : "skip"
+  );
 
   // Initialize auth state from localStorage
   useEffect(() => {
-    const storedUser = getStoredAuth();
-    setState({
-      user: storedUser,
-      isLoading: false,
-    });
+    const storedEmail = getStoredEmail();
+    setEmail(storedEmail);
+    setIsInitialized(true);
   }, []);
 
-  const login = useCallback(async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
-    // Validate inputs
-    if (!email || !password) {
-      return { success: false, error: "Email and password are required" };
+  const login = useCallback(async (userEmail: string, password: string): Promise<{ success: boolean; error?: string }> => {
+    try {
+      // Validate inputs
+      if (!userEmail || !password) {
+        return { success: false, error: "Email and password are required" };
+      }
+
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(userEmail)) {
+        return { success: false, error: "Please enter a valid email address" };
+      }
+
+      const user = await loginMutation({
+        email: userEmail,
+        password: password,
+      });
+
+      saveEmail(user.email);
+      setEmail(user.email);
+      
+      return { success: true };
+    } catch (error: any) {
+      return { 
+        success: false, 
+        error: error.message || "Login failed. Please try again." 
+      };
     }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return { success: false, error: "Please enter a valid email address" };
-    }
-
-    const users = getStoredUsers();
-    const userEntry = users[email.toLowerCase()];
-
-    if (!userEntry) {
-      return { success: false, error: "No account found with this email" };
-    }
-
-    if (userEntry.password !== password) {
-      return { success: false, error: "Incorrect password" };
-    }
-
-    saveAuth(userEntry.user);
-    setState({ user: userEntry.user, isLoading: false });
-    
-    return { success: true };
-  }, []);
+  }, [loginMutation]);
 
   const signup = useCallback(async (
     name: string,
-    email: string,
+    userEmail: string,
     password: string
   ): Promise<{ success: boolean; error?: string }> => {
-    // Validate inputs
-    if (!name || !email || !password) {
-      return { success: false, error: "All fields are required" };
+    try {
+      // Validate inputs
+      if (!name || !userEmail || !password) {
+        return { success: false, error: "All fields are required" };
+      }
+
+      if (name.length < 2) {
+        return { success: false, error: "Name must be at least 2 characters" };
+      }
+
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(userEmail)) {
+        return { success: false, error: "Please enter a valid email address" };
+      }
+
+      if (password.length < 6) {
+        return { success: false, error: "Password must be at least 6 characters" };
+      }
+
+      const user = await registerMutation({
+        email: userEmail,
+        password: password,
+        name: name,
+      });
+
+      saveEmail(user.email);
+      setEmail(user.email);
+
+      return { success: true };
+    } catch (error: any) {
+      return { 
+        success: false, 
+        error: error.message || "Registration failed. Please try again." 
+      };
     }
-
-    if (name.length < 2) {
-      return { success: false, error: "Name must be at least 2 characters" };
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return { success: false, error: "Please enter a valid email address" };
-    }
-
-    if (password.length < 6) {
-      return { success: false, error: "Password must be at least 6 characters" };
-    }
-
-    const users = getStoredUsers();
-    
-    if (users[email.toLowerCase()]) {
-      return { success: false, error: "An account with this email already exists" };
-    }
-
-    const newUser: User = {
-      id: `user-${Date.now()}`,
-      email: email.toLowerCase(),
-      name,
-      createdAt: new Date().toISOString(),
-    };
-
-    users[email.toLowerCase()] = {
-      password,
-      user: newUser,
-    };
-
-    saveUsers(users);
-    saveAuth(newUser);
-    setState({ user: newUser, isLoading: false });
-
-    return { success: true };
-  }, []);
+  }, [registerMutation]);
 
   const logout = useCallback(() => {
-    saveAuth(null);
-    setState({ user: null, isLoading: false });
+    saveEmail(null);
+    setEmail(null);
   }, []);
 
   return {
-    user: state.user,
-    isLoading: state.isLoading,
-    isAuthenticated: !!state.user,
+    user: currentUser || null,
+    isLoading: !isInitialized || (email !== null && currentUser === undefined),
+    isAuthenticated: !!currentUser,
     login,
     signup,
     logout,

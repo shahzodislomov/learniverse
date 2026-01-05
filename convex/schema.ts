@@ -2,6 +2,39 @@ import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
 export default defineSchema({
+  // User authentication and accounts
+  users: defineTable({
+    email: v.string(),
+    passwordHash: v.string(),
+    name: v.string(),
+    avatar: v.optional(v.string()),
+    bio: v.optional(v.string()),
+    photoStorageId: v.optional(v.id("_storage")),
+    isAdmin: v.boolean(),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_email", ["email"])
+    .index("by_admin", ["isAdmin"]),
+
+  // Resources table for PDFs and documents
+  resources: defineTable({
+    title: v.string(),
+    description: v.string(),
+    category: v.string(),
+    fileStorageId: v.id("_storage"),
+    fileName: v.string(),
+    fileSize: v.number(),
+    fileType: v.string(),
+    downloadCount: v.number(),
+    isPublished: v.boolean(),
+    createdBy: v.string(), // email of admin who created it
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_published", ["isPublished"])
+    .index("by_category", ["category", "isPublished"]),
+
   // Courses table
   courses: defineTable({
     slug: v.string(),
@@ -68,25 +101,25 @@ export default defineSchema({
 
   // User progress tracking
   userProgress: defineTable({
-    visitorId: v.string(), // For anonymous users, use a generated ID
+    userId: v.string(), // email for now
     lessonId: v.id("lessons"),
     courseId: v.id("courses"),
     completed: v.boolean(),
     completedAt: v.optional(v.number()),
   })
-    .index("by_visitor", ["visitorId"])
-    .index("by_visitor_course", ["visitorId", "courseId"])
-    .index("by_visitor_lesson", ["visitorId", "lessonId"]),
+    .index("by_user", ["userId"])
+    .index("by_user_course", ["userId", "courseId"])
+    .index("by_user_lesson", ["userId", "lessonId"]),
 
   // Course enrollments
   enrollments: defineTable({
-    visitorId: v.string(),
+    userId: v.string(), // email for now
     courseId: v.id("courses"),
     enrolledAt: v.number(),
     lastAccessedAt: v.number(),
   })
-    .index("by_visitor", ["visitorId"])
-    .index("by_visitor_course", ["visitorId", "courseId"]),
+    .index("by_user", ["userId"])
+    .index("by_user_course", ["userId", "courseId"]),
 
   // CTF Challenges
   ctfChallenges: defineTable({
@@ -127,20 +160,6 @@ export default defineSchema({
     .index("by_user", ["userEmail"])
     .index("by_user_challenge", ["userEmail", "challengeId"])
     .index("by_correct", ["isCorrect", "submittedAt"]),
-
-  // User profiles and settings
-  userProfiles: defineTable({
-    email: v.string(),
-    name: v.string(),
-    avatar: v.string(), // emoji or url
-    bio: v.optional(v.string()),
-    photoStorageId: v.optional(v.id("_storage")),
-    isAdmin: v.boolean(),
-    createdAt: v.number(),
-    updatedAt: v.number(),
-  })
-    .index("by_email", ["email"])
-    .index("by_admin", ["isAdmin"]),
 
   // Site settings (logo, etc.)
   siteSettings: defineTable({

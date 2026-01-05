@@ -8,7 +8,7 @@ export const getProfile = query({
   args: { email: v.string() },
   handler: async (ctx, args) => {
     const profile = await ctx.db
-      .query("userProfiles")
+      .query("users")
       .withIndex("by_email", (q) => q.eq("email", args.email))
       .first();
 
@@ -24,13 +24,13 @@ export const getProfile = query({
   },
 });
 
-// Create user profile
+// Create user profile (deprecated - use auth.register instead)
 export const createProfile = mutation({
   args: { email: v.string(), name: v.optional(v.string()) },
   handler: async (ctx, args) => {
     // Check if already exists
     const existing = await ctx.db
-      .query("userProfiles")
+      .query("users")
       .withIndex("by_email", (q) => q.eq("email", args.email))
       .first();
 
@@ -38,16 +38,8 @@ export const createProfile = mutation({
       return existing._id;
     }
 
-    const profileId = await ctx.db.insert("userProfiles", {
-      email: args.email,
-      name: args.name || args.email.split("@")[0],
-      avatar: "default",
-      isAdmin: args.email === ADMIN_EMAIL,
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-    });
-
-    return profileId;
+    // This is deprecated - users should be created via auth.register
+    throw new Error("Please use auth.register to create new users");
   },
 });
 
@@ -64,7 +56,7 @@ export const updateProfile = mutation({
     const { email, ...updates } = args;
     
     const profile = await ctx.db
-      .query("userProfiles")
+      .query("users")
       .withIndex("by_email", (q) => q.eq("email", email))
       .first();
 
@@ -86,7 +78,7 @@ export const getProfileByEmail = query({
   args: { email: v.string() },
   handler: async (ctx, args) => {
     const profile = await ctx.db
-      .query("userProfiles")
+      .query("users")
       .withIndex("by_email", (q) => q.eq("email", args.email))
       .first();
 

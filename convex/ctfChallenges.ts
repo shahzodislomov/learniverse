@@ -198,7 +198,7 @@ export const adminGetAllChallenges = query({
   handler: async (ctx, args) => {
     // Check if user is admin
     const profile = await ctx.db
-      .query("userProfiles")
+      .query("users")
       .withIndex("by_email", (q) => q.eq("email", args.adminEmail))
       .first();
 
@@ -249,7 +249,7 @@ export const adminCreateChallenge = mutation({
   },
   handler: async (ctx, args) => {
     const profile = await ctx.db
-      .query("userProfiles")
+      .query("users")
       .withIndex("by_email", (q) => q.eq("email", args.adminEmail))
       .first();
 
@@ -298,7 +298,7 @@ export const adminUpdateChallenge = mutation({
   },
   handler: async (ctx, args) => {
     const profile = await ctx.db
-      .query("userProfiles")
+      .query("users")
       .withIndex("by_email", (q) => q.eq("email", args.adminEmail))
       .first();
 
@@ -325,7 +325,7 @@ export const adminDeleteChallenge = mutation({
   },
   handler: async (ctx, args) => {
     const profile = await ctx.db
-      .query("userProfiles")
+      .query("users")
       .withIndex("by_email", (q) => q.eq("email", args.adminEmail))
       .first();
 
@@ -368,7 +368,7 @@ export const getScoreboard = query({
     }>();
 
     // Get user profiles for nicknames
-    const profiles = await ctx.db.query("userProfiles").collect();
+    const profiles = await ctx.db.query("users").collect();
     const profileMap = new Map(profiles.map(p => [p.email, p.name]));
 
     submissions.forEach(sub => {

@@ -29,7 +29,7 @@ export default function Login() {
         title: "Welcome back!",
         variant: "default",
       });
-      router.push("/dashboard");
+      router.push("/profile");
     } else {
       toast({
         title: result.error || "Login failed",

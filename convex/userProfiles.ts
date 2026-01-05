@@ -9,25 +9,13 @@ export const getOrCreateProfile = mutation({
   },
   handler: async (ctx, args) => {
     let profile = await ctx.db
-      .query("userProfiles")
+      .query("users")
       .withIndex("by_email", (q) => q.eq("email", args.email))
       .first();
 
     if (!profile) {
-      // Create new profile - only wenaco34@gmail.com is admin
-      const isAdmin = args.email === "wenaco34@gmail.com";
-      
-      const profileId = await ctx.db.insert("userProfiles", {
-        email: args.email,
-        name: args.name,
-        avatar: "default",
-        bio: "",
-        isAdmin,
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
-      });
-
-      profile = await ctx.db.get(profileId);
+      // This function is deprecated - users should be created via auth.register
+      throw new Error("User not found. Please register first.");
     }
 
     return profile;
@@ -39,7 +27,7 @@ export const getProfile = query({
   args: { email: v.string() },
   handler: async (ctx, args) => {
     const profile = await ctx.db
-      .query("userProfiles")
+      .query("users")
       .withIndex("by_email", (q) => q.eq("email", args.email))
       .first();
 
@@ -57,7 +45,7 @@ export const updateProfile = mutation({
   },
   handler: async (ctx, args) => {
     const profile = await ctx.db
-      .query("userProfiles")
+      .query("users")
       .withIndex("by_email", (q) => q.eq("email", args.email))
       .first();
 
@@ -81,7 +69,7 @@ export const checkAdmin = query({
   args: { email: v.string() },
   handler: async (ctx, args) => {
     const profile = await ctx.db
-      .query("userProfiles")
+      .query("users")
       .withIndex("by_email", (q) => q.eq("email", args.email))
       .first();
 
@@ -94,7 +82,7 @@ export const checkAdmin = query({
 // Get all authenticated users (for community page)
 export const getAllUsers = query({
   handler: async (ctx) => {
-    const profiles = await ctx.db.query("userProfiles").collect();
+    const profiles = await ctx.db.query("users").collect();
     
     return profiles.map(profile => ({
       email: profile.email,

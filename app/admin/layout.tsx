@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, BookOpen, Newspaper, ArrowLeft, Shield, FileText, Settings } from "lucide-react";
+import { LayoutDashboard, BookOpen, Newspaper, ArrowLeft, Shield, FileText, Settings, Users } from "lucide-react";
 import { useAdminGuard } from "@/hooks/useAdminGuard";
 import { Loader2 } from "lucide-react";
 
@@ -13,6 +13,7 @@ const adminNavLinks = [
   { href: "/admin/news", label: "News", icon: Newspaper },
   { href: "/admin/resources", label: "Resources", icon: FileText },
   { href: "/admin/ctf", label: "CTF Challenges", icon: Shield },
+  { href: "/admin/users", label: "Users", icon: Users },
   { href: "/admin/settings", label: "Settings", icon: Settings },
 ];
 

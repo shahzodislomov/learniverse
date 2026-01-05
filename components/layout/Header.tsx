@@ -40,7 +40,7 @@ export function Header() {
 
   useEffect(() => {
     if (user) {
-      const savedProfile = localStorage.getItem(`profile_${user.id}`);
+      const savedProfile = localStorage.getItem(`profile_${user.userId}`);
       if (savedProfile) {
         const profile = JSON.parse(savedProfile);
         const avatarEmojis: Record<string, string> = {
