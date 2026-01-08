@@ -26,7 +26,7 @@ export default function RulesPage() {
     {
       icon: Trophy,
       title: "First Blood Bonus",
-      description: "The first person to solve a challenge receives 10% bonus points!",
+      description: "The first person to solve a challenge receives 50% bonus points!",
       color: "text-red-400",
     },
     {
