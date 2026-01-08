@@ -125,29 +125,26 @@ export default function CourseDetail() {
               className="lg:sticky lg:top-4"
             >
               <div className="overflow-hidden rounded-xl border border-border bg-card p-6">
-                <div className="mb-6 aspect-video w-full overflow-hidden rounded-lg bg-muted">
-                  {/* Course preview image/video placeholder */}
-                  <div className="flex h-full items-center justify-center">
-                    <Play className="h-16 w-16 text-muted-foreground" />
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <Button className="w-full" size="lg">
-                    <Play className="mr-2 h-5 w-5" />
-                    Start Learning
-                  </Button>
-                  
-                  <div className="flex gap-2">
-                    <Button variant="outline" size="sm" className="flex-1">
-                      <Download className="mr-2 h-4 w-4" />
-                      Download
-                    </Button>
-                    <Button variant="outline" size="sm" className="flex-1">
-                      <Share2 className="mr-2 h-4 w-4" />
-                      Share
-                    </Button>
-                  </div>
+                <div className="mb-6 aspect-video w-full overflow-hidden rounded-lg bg-muted relative">
+                  {/* Course preview image/video */}
+                  {course.image ? (
+                    <>
+                      <img 
+                        src={course.image} 
+                        alt={course.title}
+                        className="h-full w-full object-cover"
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/20 hover:bg-black/30 transition-colors">
+                        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/90 hover:bg-primary transition-colors">
+                          <Play className="h-8 w-8 text-primary-foreground" />
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="flex h-full items-center justify-center">
+                      <Play className="h-16 w-16 text-muted-foreground" />
+                    </div>
+                  )}
                 </div>
               </div>
             </motion.div>

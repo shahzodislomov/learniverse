@@ -16,6 +16,7 @@ import type * as news from "../news.js";
 import type * as resources from "../resources.js";
 import type * as seed from "../seed.js";
 import type * as siteSettings from "../siteSettings.js";
+import type * as stats from "../stats.js";
 import type * as storage from "../storage.js";
 import type * as userProfiles from "../userProfiles.js";
 import type * as users from "../users.js";
@@ -35,6 +36,7 @@ declare const fullApi: ApiFromModules<{
   resources: typeof resources;
   seed: typeof seed;
   siteSettings: typeof siteSettings;
+  stats: typeof stats;
   storage: typeof storage;
   userProfiles: typeof userProfiles;
   users: typeof users;

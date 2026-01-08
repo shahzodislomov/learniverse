@@ -220,7 +220,7 @@ export default function ChallengeModal({
                         value={flag}
                         onChange={(e) => setFlag(e.target.value)}
                         placeholder="WEN{...}"
-                        className="w-full px-4 py-3 bg-hacker-dark border border-hacker-green/30 rounded focus:outline-none focus:border-hacker-green focus:shadow-glow-green-sm text-hacker-green font-mono text-black"
+                        className="w-full px-4 py-3 bg-hacker-dark border border-hacker-green/30 rounded focus:outline-none focus:border-hacker-green focus:shadow-glow-green-sm text-hacker-green font-mono text-white bg-black"
                         disabled={isSubmitting}
                       />
                     </div>
@@ -323,7 +323,7 @@ export default function ChallengeModal({
                                 </motion.span>
                               )}
                               <span className="text-hacker-green font-semibold">
-                                {solver.userEmail.split('@')[0]}
+                                {solver.userName}
                               </span>
                             </div>
                             <span className="text-gray-500 text-xs">

@@ -56,40 +56,6 @@ const communityLinks = [
   },
 ];
 
-
-const recentDiscussions = [
-  {
-    title: "Best resources for learning binary exploitation?",
-    author: "newbie_hacker",
-    replies: 24,
-    category: "Learning",
-  },
-  {
-    title: "CTF Team looking for members",
-    author: "ctf_captain",
-    replies: 18,
-    category: "Teams",
-  },
-  {
-    title: "Walkthrough: HTB Machine Cascade",
-    author: "pwned_it",
-    replies: 45,
-    category: "Writeups",
-  },
-  {
-    title: "Career advice: Red team vs Blue team?",
-    author: "career_switch",
-    replies: 32,
-    category: "Career",
-  },
-  {
-    title: "New OWASP Top 10 2024 Discussion",
-    author: "web_sec_pro",
-    replies: 67,
-    category: "News",
-  },
-];
-
 export default function CommunityPage() {
   const scoreboard = useQuery(api.ctfChallenges.getScoreboard, { limit: 10 });
   const allUsers = useQuery(api.userProfiles.getAllUsers);
@@ -198,7 +164,7 @@ export default function CommunityPage() {
                           {user.email.slice(0, 2).toUpperCase()}
                         </div>
                         <div className="flex-1">
-                          <p className="font-medium">{user.email.split('@')[0]}</p>
+                          <p className="font-medium">{user.nickname}</p>
                           <p className="text-xs text-muted-foreground">
                             {user.solvedChallenges} challenges · {user.firstBloods} first bloods
                           </p>

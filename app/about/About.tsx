@@ -2,7 +2,19 @@
 
 import { MainLayout } from "@/components/layout/MainLayout";
 import { motion } from "framer-motion";
-import { Shield, Users, Target, Award, Github, Linkedin } from "lucide-react";
+import { Target, Award, Github, Linkedin } from "lucide-react";
+import {
+  Search,
+  ArrowRight,
+  Code2,
+  Terminal,
+  Shield,
+  Zap,
+  Trophy,
+  Users,
+  BookOpen,
+  Loader2
+} from "lucide-react";
 
 function TelegramIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
@@ -14,13 +26,9 @@ function TelegramIcon(props: React.SVGProps<SVGSVGElement>) {
 }
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-
-const stats = [
-  { value: "50K+", label: "Active Learners" },
-  { value: "100+", label: "Expert Courses" },
-  { value: "500+", label: "Hands-on Labs" },
-  { value: "95%", label: "Success Rate" },
-];
+import { useFeaturedCourses, useFeaturedNews } from "@/hooks/useConvex";
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
 
 const values = [
   {
@@ -57,9 +65,27 @@ const team = [
       telegram: "https://t.me/shawn.isl",
     },
   },
+  {
+    name: "Abdulloh Qurbonov",
+    role: "Contributor",
+    bio: "Contributing to make cybersecurity education more accessible and helping build a better learning platform for everyone.",
+    avatar: "AQ",
+    social: {
+      github: "https://github.com/abdullohqurbon0v",
+      linkedin: "https://www.linkedin.com/in/abdulloh-qurbonov-030bb7357/",
+      telegram: "https://t.me/Secure_byt3",
+    },
+  },
 ];
 
 export default function About() {
+  const platformStats = useQuery(api.stats.getPlatformStats);
+  const stats = [
+    { icon: BookOpen, value: platformStats ? `${platformStats.courses}+` : "...", label: "Courses" },
+    { icon: Terminal, value: platformStats ? `${platformStats.labs}+` : "...", label: "Challenges" },
+    { icon: Users, value: platformStats ? `${platformStats.learners}+` : "...", label: "Learners" },
+    { icon: Trophy, value: platformStats ? `${platformStats.certificates}+` : "...", label: "Certificates" },
+  ];
   return (
     <MainLayout>
       {/* Hero */}
@@ -223,8 +249,7 @@ export default function About() {
               education.
             </p>
           </motion.div>
-
-          <div className="md:grid-cols-2 lg:grid-cols-3 justify-center">
+          <div className="flex flex-row justify-center gap-6">
             {team.map((member, index) => (
               <motion.div
                 key={member.name}
@@ -242,23 +267,27 @@ export default function About() {
                   {member.bio}
                 </p>
                 <div className="flex justify-center gap-3">
-                  <a
-                    href={member.social.github}
-                    className="text-muted-foreground hover:text-foreground"
-                  >
-                    <Github className="h-5 w-5" />
-                  </a>
+                  {member.social.github && (
+                    <a
+                      href={member.social.github}
+                      className="text-muted-foreground hover:text-foreground"
+                    >
+                      <Github className="h-5 w-5" />
+                    </a>
+                  )}
                   {member.social.telegram && (
                     <a href={member.social.telegram} className="text-muted-foreground hover:text-foreground">
                       <TelegramIcon className="h-5 w-5" />
                     </a>
                   )}
-                  <a
-                    href={member.social.linkedin}
-                    className="text-muted-foreground hover:text-foreground"
-                  >
-                    <Linkedin className="h-5 w-5" />
-                  </a>
+                  {member.social.linkedin && (
+                    <a
+                      href={member.social.linkedin}
+                      className="text-muted-foreground hover:text-foreground"
+                    >
+                      <Linkedin className="h-5 w-5" />
+                    </a>
+                  )}
                 </div>
               </motion.div>
             ))}

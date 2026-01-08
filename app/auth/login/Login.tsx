@@ -17,10 +17,12 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setErrorMessage("");
 
     const result = await login(email, password);
     
@@ -31,10 +33,14 @@ export default function Login() {
       });
       router.push("/profile");
     } else {
-      toast({
-        title: result.error || "Login failed",
-        variant: "destructive",
-      });
+      // Show user-friendly error message
+      const friendlyError = result.error?.toLowerCase().includes("password") || 
+                           result.error?.toLowerCase().includes("credentials") ||
+                           result.error?.toLowerCase().includes("not found")
+        ? "Incorrect username or password"
+        : result.error || "Login failed";
+      
+      setErrorMessage(friendlyError);
     }
     
     setIsSubmitting(false);
@@ -139,6 +145,17 @@ export default function Login() {
               Sign up
             </Link>
           </div>
+
+          {/* Error message */}
+          {errorMessage && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mt-4 rounded-lg border border-destructive/50 bg-destructive/10 p-3"
+            >
+              <p className="text-sm text-destructive">{errorMessage}</p>
+            </motion.div>
+          )}
 
           {/* Demo credentials hint */}
           <div className="mt-8 rounded-lg border border-border bg-muted/30 p-4">

@@ -135,8 +135,13 @@ export const getChallengeSolvers = query({
       .order("asc")
       .collect();
 
+    // Get user profiles for names
+    const profiles = await ctx.db.query("users").collect();
+    const profileMap = new Map(profiles.map(p => [p.email, p.name]));
+
     return submissions.map((sub, index) => ({
       userEmail: sub.userEmail,
+      userName: profileMap.get(sub.userEmail) || sub.userEmail.split('@')[0],
       solvedAt: sub.submittedAt,
       solveOrder: index + 1,
       firstBlood: sub.isFirstBlood,

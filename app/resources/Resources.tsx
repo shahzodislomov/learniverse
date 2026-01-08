@@ -208,17 +208,6 @@ export default function ResourcesPage() {
       </section>
 
       {/* Contribute CTA */}
-      <section className="border-t border-border py-16">
-        <div className="container mx-auto max-w-7xl px-4 text-center">
-          <h2 className="mb-4 text-2xl font-bold">Have a Resource to Share?</h2>
-          <p className="mx-auto mb-6 max-w-xl text-muted-foreground">
-            Contribute to our growing collection of security resources and help the community learn.
-          </p>
-          <Button variant="heroOutline" size="lg">
-            Submit a Resource
-          </Button>
-        </div>
-      </section>
     </MainLayout>
   );
 }

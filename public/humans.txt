@@ -8,6 +8,10 @@ LinkedIn: linkedin.com/in/shahzodislomov
 Telegram: t.me/shawn.isl
 Location: Worldwide
 
+Contributor: Abdulloh Qurbonov
+Role: Contributor
+Location: Worldwide
+
 /* THANKS */
 
 Community: Our amazing cybersecurity learning community

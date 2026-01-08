@@ -8,6 +8,8 @@ import { NewsCard } from "@/components/news/NewsCard";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { useFeaturedCourses, useFeaturedNews } from "@/hooks/useConvex";
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
 import { 
   Search, 
   ArrowRight, 
@@ -26,31 +28,20 @@ const learningTracks = [
     icon: Code2,
     title: "Web Security",
     description: "Master OWASP Top 10, XSS, SQL injection, and modern web vulnerabilities",
-    courses: 24,
     color: "text-primary",
   },
   {
     icon: Terminal,
     title: "Penetration Testing",
     description: "Learn ethical hacking, network scanning, and exploitation techniques",
-    courses: 18,
     color: "text-secondary",
   },
   {
     icon: Shield,
     title: "Blue Team Defense",
     description: "Build skills in threat detection, incident response, and forensics",
-    courses: 16,
     color: "text-success",
   },
-];
-
-
-const stats = [
-  { icon: BookOpen, value: "150+", label: "Courses" },
-  { icon: Terminal, value: "500+", label: "Labs" },
-  { icon: Users, value: "50K+", label: "Learners" },
-  { icon: Trophy, value: "10K+", label: "Certificates" },
 ];
 
 const containerVariants = {
@@ -71,6 +62,14 @@ const itemVariants = {
 const Index = () => {
   const featuredCourses = useFeaturedCourses();
   const featuredNews = useFeaturedNews();
+  const platformStats = useQuery(api.stats.getPlatformStats);
+
+  const stats = [
+    { icon: BookOpen, value: platformStats ? `${platformStats.courses}+` : "...", label: "Courses" },
+    { icon: Terminal, value: platformStats ? `${platformStats.labs}+` : "...", label: "Challenges" },
+    { icon: Users, value: platformStats ? `${platformStats.learners}+` : "...", label: "Learners" },
+    { icon: Trophy, value: platformStats ? `${platformStats.certificates}+` : "...", label: "Certificates" },
+  ];
 
   return (
     <MainLayout>
@@ -183,8 +182,7 @@ const Index = () => {
                 </div>
                 <h3 className="mb-2 text-xl font-semibold">{track.title}</h3>
                 <p className="mb-4 text-sm text-muted-foreground">{track.description}</p>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">{track.courses} courses</span>
+                <div className="flex items-center justify-end">
                   <Link href="/courses" className="flex items-center gap-1 text-sm font-medium text-primary hover:underline">
                     Explore
                     <ArrowRight className="h-4 w-4" />
