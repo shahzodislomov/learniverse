@@ -97,19 +97,19 @@ export default function RulesPage() {
             <div className="flex items-start space-x-3">
               <CheckCircle className="w-5 h-5 text-hacker-green mt-1 flex-shrink-0" />
               <div>
-                <strong className="text-hacker-cyan">Easy Challenges:</strong> 100-200 points
+                <strong className="text-hacker-cyan">Easy Challenges:</strong> 50 points
               </div>
             </div>
             <div className="flex items-start space-x-3">
               <CheckCircle className="w-5 h-5 text-yellow-400 mt-1 flex-shrink-0" />
               <div>
-                <strong className="text-hacker-cyan">Medium Challenges:</strong> 250-400 points
+                <strong className="text-hacker-cyan">Medium Challenges:</strong> 100 points
               </div>
             </div>
             <div className="flex items-start space-x-3">
               <CheckCircle className="w-5 h-5 text-red-400 mt-1 flex-shrink-0" />
               <div>
-                <strong className="text-hacker-cyan">Hard Challenges:</strong> 500-800 points
+                <strong className="text-hacker-cyan">Hard Challenges:</strong> 150 points
               </div>
             </div>
             <div className="flex items-start space-x-3">
